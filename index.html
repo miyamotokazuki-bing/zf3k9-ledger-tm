@@ -489,7 +489,7 @@
   .memories{ display:flex; flex-direction:column; gap:18px; padding:0 16px 16px; }
   .memory-card{
     background:var(--cream); border-radius:4px; padding:10px; padding-bottom:16px;
-    box-shadow:0 4px 10px rgba(27,42,56,0.12); border:1px solid var(--line);
+    box-shadow:0 4px 10px rgba(27,42,56,0.12); border:2px solid var(--cat-accent, var(--line));
     cursor:pointer;
   }
   .memory-card.editing{ cursor:default; box-shadow:0 4px 14px rgba(27,42,56,0.2); border-color:var(--ink); }
@@ -613,7 +613,7 @@
       repeating-linear-gradient(95deg, rgba(255,255,255,0.05) 0px, transparent 2px, transparent 7px),
       radial-gradient(ellipse 65% 55% at 30% 20%, rgba(255,214,160,0.28), transparent 62%),
       linear-gradient(155deg,#8a5a38,#6b4028 55%,#432a17);
-    border:2px solid rgba(255,238,214,0.5);
+    border:3px solid var(--stamp-accent, rgba(255,238,214,0.5));
     border-radius:5px;
     color:#FBF0DC;
     font-family:var(--font-serif);
@@ -628,7 +628,7 @@
     text-align:center;
   }
   .yakiin-stamp::before{
-    content:''; position:absolute; inset:3px; border:1px solid rgba(255,238,214,0.32); border-radius:3px; pointer-events:none;
+    content:''; position:absolute; inset:3px; border:1px solid var(--stamp-accent, rgba(255,238,214,0.32)); opacity:0.65; border-radius:3px; pointer-events:none;
   }
 
 
@@ -703,10 +703,10 @@
     display:flex; align-items:center; gap:10px; padding:11px 16px; border-bottom:1px solid var(--line); cursor:pointer;
   }
   .stamp-report-row .icon{ font-size:16px; }
-  .stamp-report-row .nm{ flex:1; font-size:12.5px; color:var(--ink); }
-  .stamp-report-row .cnt{ font-size:13px; font-weight:700; color:var(--bengara); }
+  .stamp-report-row .nm{ flex:1; font-size:13.5px; font-weight:600; color:var(--ink); }
+  .stamp-report-row .cnt{ font-size:13px; font-weight:700; color:var(--ink60); }
   .stamp-report-row .cnt-amt{ display:flex; align-items:center; gap:8px; }
-  .stamp-report-row .amt-total{ font-size:11.5px; color:var(--ink60); }
+  .stamp-report-row .amt-total{ font-size:13px; font-weight:700; color:var(--ink60); }
   .stamp-report-row .chev{ color:var(--ink40); font-size:11px; transition:transform .2s; }
   .stamp-report-row .chev.open{ transform:rotate(90deg); }
   .stamp-detail-item{
@@ -767,9 +767,23 @@
     border:1px solid var(--line); border-radius:8px; padding:8px 10px;
     font-family:var(--font-sans); font-size:12.5px;
     background:var(--cream); color:var(--ink);
+    -moz-appearance:textfield;
+  }
+  .fixed-form input[type="number"]::-webkit-outer-spin-button,
+  .fixed-form input[type="number"]::-webkit-inner-spin-button{
+    -webkit-appearance:none; margin:0;
   }
   .fixed-form .field{ flex:1; display:flex; flex-direction:column; gap:3px; }
   .fixed-form .field label{ font-size:10.5px; color:var(--ink60); }
+  .fc-enddate-row{ display:flex; gap:6px; align-items:center; }
+  .fc-enddate-btn{
+    flex:1; text-align:left; border:1px solid var(--line); border-radius:8px; padding:8px 10px;
+    font-family:var(--font-sans); font-size:12.5px; background:var(--cream); color:var(--ink);
+  }
+  .fc-enddate-clear{
+    flex:0 0 auto; width:30px; height:30px; border-radius:8px; border:none;
+    background:var(--paperDeep); color:var(--ink60); font-size:12px;
+  }
   .fixed-form .add-btn{
     width:100%; padding:10px 0; border-radius:10px; border:none; background:var(--ink);
     color:var(--cream); font-weight:700; font-size:13px; cursor:pointer; margin-top:2px;
@@ -1075,7 +1089,7 @@
     box-shadow: inset 2px 2px 5px var(--neu-dark), inset -2px -2px 5px var(--neu-light);
   }
   .memory-neu .memory-card{
-    background:var(--paper); border:none;
+    background:var(--paper); border:2px solid var(--cat-accent, transparent);
     box-shadow: 8px 8px 16px var(--neu-dark), -8px -8px 16px var(--neu-light);
   }
   .memory-neu .memory-card.editing{
@@ -1295,6 +1309,7 @@ let state = {
   catAddOpen: false,
   datePickerOpen: false,
   datePickerYear: 2026,
+  datePickerTarget: "input",
   datePickerMonth: 8,
   datePickerDay: 9,
 
@@ -1644,7 +1659,7 @@ function render(){
 function renderDatePickerSheet(){
   const sheet = document.getElementById("datePickerSheet");
   const backdrop = document.getElementById("datePickerBackdrop");
-  const show = state.tab === "input" && state.datePickerOpen;
+  const show = state.datePickerOpen;
   if(show){
     sheet.classList.add("open");
     backdrop.classList.add("open");
@@ -2224,7 +2239,7 @@ function buildSimpleMemoryCards(txList){
       return `<div class="yakiin-stamp" style="left:calc(50% + ${offX}px); top:calc(56% + ${offY}px); transform:translate(-50%,-50%) rotate(${rot}deg); z-index:${6+si}; --stamp-accent:${accent};">${s.name}</div>`;
     }).join("");
     return `
-      <div class="memory-card" style="transform:rotate(${rotate}deg)" data-open-memory-report="${t.id}">
+      <div class="memory-card" style="transform:rotate(${rotate}deg); --cat-accent:${c.color};" data-open-memory-report="${t.id}">
         ${stampBadgesHtml}
         <div class="top">
           <span class="badge" style="background:${c.color}">${c.icon} ${c.name}</span>
@@ -2374,7 +2389,7 @@ function renderMemory(){
         }).join("");
 
         return `
-          <div class="memory-card ${state.reflectionMode?'stamp-mode':''} ${hasActiveStamp?'stamped-active':''}" style="transform:rotate(${rotate}deg)" ${clickAttr}>
+          <div class="memory-card ${state.reflectionMode?'stamp-mode':''} ${hasActiveStamp?'stamped-active':''}" style="transform:rotate(${rotate}deg); --cat-accent:${c.color};" ${clickAttr}>
             ${stampBadgesHtml}
             <div class="top">
               <span class="badge" style="background:${c.color}">${c.icon} ${c.name}</span>
@@ -2495,7 +2510,7 @@ function renderCatAddSheet(){
       </div>
       <label class="dine-check">
         <input type="checkbox" id="newCatDining" ${state.newCatDining?'checked':''} />
-        <span>選択時に「外食 / 自炊」を選べるようにする（食費用の項目に）</span>
+        <span>選択時に「外食 ・ 弁当」を選べるようにする（食費用の項目に）</span>
       </label>
       <button class="add-btn" id="catAddSubmitBtn">追加する</button>
     `;
@@ -2670,7 +2685,10 @@ function renderSettings(){
         <div class="row">
           <div class="field">
             <label>終了日（任意）</label>
-            <input type="date" id="fcEndDate" value="${state.fcEndDate}" />
+            <div class="fc-enddate-row">
+              <button type="button" class="fc-enddate-btn" id="fcEndDateBtn">${state.fcEndDate ? state.fcEndDate : '指定しない'}</button>
+              ${state.fcEndDate ? `<button type="button" class="fc-enddate-clear" id="fcEndDateClearBtn">✕</button>` : ''}
+            </div>
           </div>
         </div>
         <button class="add-btn" id="addFixedBtn">固定費を追加</button>
@@ -2830,7 +2848,7 @@ function renderSettings(){
       </div>
       <label class="dine-check">
         <input type="checkbox" id="newCatDining" ${state.newCatDining?'checked':''} />
-        <span>選択時に「外食 / 自炊」を選べるようにする（食費用の項目に）</span>
+        <span>選択時に「外食 ・ 弁当」を選べるようにする（食費用の項目に）</span>
       </label>
       <button class="add-btn" id="addCatBtn">カテゴリを追加</button>
     </div>
@@ -3446,7 +3464,6 @@ function attachHandlers(){
       const fcCat = document.getElementById("fcCat");
       const fcAmount = document.getElementById("fcAmount");
       const fcDay = document.getElementById("fcDay");
-      const fcEndDate = document.getElementById("fcEndDate");
       if(fcType) fcType.onchange = (e)=>{
         state.fcType = e.target.value;
         const firstOfType = state.categories.find(c=>c.type===state.fcType);
@@ -3456,7 +3473,23 @@ function attachHandlers(){
       if(fcCat) fcCat.onchange = (e)=>{ state.fcCat = e.target.value; };
       if(fcAmount) fcAmount.oninput = (e)=>{ state.fcAmount = e.target.value; };
       if(fcDay) fcDay.onchange = (e)=>{ state.fcDay = e.target.value; };
-      if(fcEndDate) fcEndDate.onchange = (e)=>{ state.fcEndDate = e.target.value; };
+
+      const fcEndDateBtn = document.getElementById("fcEndDateBtn");
+      if(fcEndDateBtn){
+        fcEndDateBtn.onclick = ()=>{
+          const base = state.fcEndDate ? state.fcEndDate.split('-').map(Number) : null;
+          state.datePickerYear = base ? base[0] : state.datePickerYear;
+          state.datePickerMonth = base ? base[1] : state.datePickerMonth;
+          state.datePickerDay = base ? base[2] : state.datePickerDay;
+          state.datePickerTarget = "fcEndDate";
+          state.datePickerOpen = true;
+          render();
+        };
+      }
+      const fcEndDateClearBtn = document.getElementById("fcEndDateClearBtn");
+      if(fcEndDateClearBtn){
+        fcEndDateClearBtn.onclick = ()=>{ state.fcEndDate = ""; render(); };
+      }
 
       const addBtn = document.getElementById("addFixedBtn");
       if(addBtn){
@@ -4024,8 +4057,14 @@ function attachHandlers(){
         const y = state.datePickerYear;
         const m = String(state.datePickerMonth).padStart(2,'0');
         const d = String(state.datePickerDay).padStart(2,'0');
-        state.inputDate = `${y}-${m}-${d}`;
+        const picked = `${y}-${m}-${d}`;
+        if(state.datePickerTarget === "fcEndDate"){
+          state.fcEndDate = picked;
+        } else {
+          state.inputDate = picked;
+        }
         state.datePickerOpen = false;
+        state.datePickerTarget = "input";
         render();
       };
     }
