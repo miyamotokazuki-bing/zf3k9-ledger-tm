@@ -13,6 +13,26 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+  @font-face{
+    font-family:'cinecaption';
+    src:url('fonts/cinecaption226.woff2') format('woff2');
+    font-display:swap;
+  }
+  @font-face{
+    font-family:'WDXL Lubrifont JP N';
+    src:url('fonts/WDXLLubrifontJPN-Regular.woff2') format('woff2');
+    font-display:swap;
+  }
+  @font-face{
+    font-family:'ShimbashiGothic';
+    src:url('fonts/ShimbashiGothic-Regular.woff2') format('woff2');
+    font-display:swap;
+  }
+  @font-face{
+    font-family:'chika';
+    src:url('fonts/chika-Regular.woff2') format('woff2');
+    font-display:swap;
+  }
   :root{
     --ink:#1B2A38;
     --paper:#F2E9DA;
@@ -26,6 +46,8 @@
     --ink40:rgba(27,42,56,0.4);
     --neu-dark:#D6C9AC;
     --neu-light:#FFFFFF;
+    --font-serif:'Shippori Mincho', serif;
+    --font-sans:'Zen Kaku Gothic New', sans-serif;
   }
   *{box-sizing:border-box;}
   body{
@@ -36,7 +58,7 @@
     justify-content:center;
     padding:24px 0;
     background:linear-gradient(180deg,#DCD0B4 0%, #C9BC9C 100%);
-    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-family:var(--font-sans);
   }
   .phone{
     width:380px;
@@ -60,7 +82,7 @@
     justify-content:space-between;
   }
   .header .title{
-    font-family:'Shippori Mincho', serif;
+    font-family:var(--font-serif);
     font-weight:700;
     font-size:19px;
     color:var(--cream);
@@ -148,7 +170,7 @@
   .date-chip.custom{ border-style:dashed; }
 
   .date-picker-title{
-    text-align:center; font-family:'Shippori Mincho', serif; font-size:15px; color:var(--ink);
+    text-align:center; font-family:var(--font-serif); font-size:15px; color:var(--ink);
     margin-bottom:8px;
   }
   .wheel-row{
@@ -162,7 +184,7 @@
   .wheel-pad-top, .wheel-pad-bottom{ height:76px; }
   .wheel-item{
     height:38px; line-height:38px; text-align:center; scroll-snap-align:center;
-    font-family:'Shippori Mincho', serif; font-size:15px; color:var(--ink60);
+    font-family:var(--font-serif); font-size:15px; color:var(--ink60);
   }
   .wheel-center-line{
     position:absolute; left:0; right:0; top:76px; height:38px;
@@ -196,7 +218,7 @@
     padding:0 2px;
   }
   .amount-box .num{
-    font-family:'Shippori Mincho', serif;
+    font-family:var(--font-serif);
     font-size:34px;
     color:var(--ink);
     letter-spacing:.5px;
@@ -238,7 +260,7 @@
   .cat-quick-add-form .row{ display:flex; gap:8px; margin-bottom:8px; }
   .cat-quick-add-form input[type="text"]{
     border:1px solid var(--line); border-radius:8px; padding:7px 9px;
-    font-family:'Zen Kaku Gothic New', sans-serif; font-size:12.5px; background:white; color:var(--ink);
+    font-family:var(--font-sans); font-size:12.5px; background:white; color:var(--ink);
   }
   .cat-quick-add-form .icon-input{ width:46px; text-align:center; flex:0 0 auto; }
   .cat-quick-add-form .name-input{ flex:1; }
@@ -281,7 +303,7 @@
   }
   textarea.comment{
     flex:1; resize:none; height:64px; border:none; background:transparent;
-    font-family:'Zen Kaku Gothic New', sans-serif; font-size:13px; color:var(--ink);
+    font-family:var(--font-sans); font-size:13px; color:var(--ink);
     outline:none; line-height:1.5;
   }
 
@@ -310,7 +332,7 @@
     width:36px; height:4px; border-radius:999px; background:var(--line); margin:4px auto 12px;
   }
   .calc-sheet .calc-amount-preview{
-    text-align:right; font-family:'Shippori Mincho', serif; font-size:26px; color:var(--ink);
+    text-align:right; font-family:var(--font-serif); font-size:26px; color:var(--ink);
     margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--line);
   }
   .calc-grid{
@@ -361,7 +383,7 @@
   .cal-head{
     display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;
   }
-  .cal-head .ym{ font-family:'Shippori Mincho', serif; font-size:17px; color:var(--ink); }
+  .cal-head .ym{ font-family:var(--font-serif); font-size:17px; color:var(--ink); }
   .nav-round{
     width:30px; height:30px; border-radius:50%; border:1px solid var(--line);
     background:var(--cream); display:flex; align-items:center; justify-content:center; cursor:pointer;
@@ -416,7 +438,7 @@
   .dining-stat .main{ font-size:13px; color:var(--bengara); font-weight:700; }
   .dining-stat .sub{ font-size:11px; color:var(--ink60); margin-top:2px; }
 
-  .report-title{ font-family:'Shippori Mincho', serif; font-size:15px; color:var(--ink); margin:0 0 10px; padding:0 16px;}
+  .report-title{ font-family:var(--font-serif); font-size:15px; color:var(--ink); margin:0 0 10px; padding:0 16px;}
   .stamp-period-toggle{ display:flex; gap:4px; flex:0 0 auto; }
   .stamp-period-toggle button{
     padding:5px 10px; border-radius:999px; border:1px solid var(--line); background:var(--cream);
@@ -456,7 +478,7 @@
 
   /* ---- Memory tab ---- */
   .memory-month-nav{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px 10px; }
-  .memory-month-nav .ym{ font-family:'Shippori Mincho', serif; font-size:16px; color:var(--ink); }
+  .memory-month-nav .ym{ font-family:var(--font-serif); font-size:16px; color:var(--ink); }
   .filter-row{ display:flex; gap:6px; overflow-x:auto; padding:0 16px 12px; }
   .pill{
     flex:0 0 auto; padding:6px 12px; border-radius:999px; border:1px solid var(--line);
@@ -475,7 +497,7 @@
   .memory-card .date{ font-size:10.5px; color:var(--ink40); }
   .memory-card .amt{ margin-left:auto; font-size:13px; font-weight:700; }
   .memory-card img{ width:100%; height:180px; object-fit:cover; border-radius:2px; margin-bottom:8px; }
-  .memory-card .cmt{ font-family:'Shippori Mincho', serif; font-size:13px; color:var(--ink); line-height:1.7; }
+  .memory-card .cmt{ font-family:var(--font-serif); font-size:13px; color:var(--ink); line-height:1.7; }
   .memory-card .cmt.cmt-empty{ color:var(--ink40); }
   .edit-stamps-row{ display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
   .edit-stamps-row .lbl-mini{ font-size:10.5px; color:var(--ink60); }
@@ -486,7 +508,7 @@
   .edit-field-row{ display:flex; gap:8px; margin-bottom:8px; }
   .edit-field-row select, .edit-field-row input[type="number"]{
     border:1px solid var(--line); border-radius:8px; padding:7px 9px;
-    font-family:'Zen Kaku Gothic New', sans-serif; font-size:12.5px; background:white; color:var(--ink);
+    font-family:var(--font-sans); font-size:12.5px; background:white; color:var(--ink);
   }
   .edit-field-row select{ flex:1.3; }
   .edit-field-row input[type="number"]{ flex:1; text-align:right; }
@@ -498,7 +520,7 @@
   }
   textarea.edit-comment{
     width:100%; resize:none; min-height:56px; border:1px solid var(--line); border-radius:8px;
-    padding:8px; font-family:'Shippori Mincho', serif; font-size:13px; color:var(--ink);
+    padding:8px; font-family:var(--font-serif); font-size:13px; color:var(--ink);
     background:white; margin-bottom:10px; box-sizing:border-box;
   }
   .edit-actions{ display:flex; gap:6px; }
@@ -516,7 +538,7 @@
     padding:40px 32px; text-align:center;
   }
   .auth-screen .auth-logo{
-    font-family:'Shippori Mincho', serif; font-size:24px; font-weight:700; color:var(--ink); margin-bottom:8px;
+    font-family:var(--font-serif); font-size:24px; font-weight:700; color:var(--ink); margin-bottom:8px;
   }
   .auth-screen .auth-sub{ font-size:12px; color:var(--ink60); margin-bottom:40px; }
   .auth-google-btn{
@@ -585,27 +607,27 @@
 
   .yakiin-stamp{
     position:absolute;
-    padding:8px 13px;
-    background:var(--paper);
-    border:2px solid var(--stamp-accent, var(--bengara));
-    border-radius:16px;
-    color:var(--ink);
-    font-family:'Shippori Mincho', serif;
+    padding:8px 12px;
+    background:
+      repeating-linear-gradient(95deg, rgba(255,255,255,0.05) 0px, transparent 2px, transparent 7px),
+      radial-gradient(ellipse 65% 55% at 30% 20%, rgba(255,214,160,0.28), transparent 62%),
+      linear-gradient(155deg,#8a5a38,#6b4028 55%,#432a17);
+    border:2px solid rgba(255,238,214,0.5);
+    border-radius:5px;
+    color:#FBF0DC;
+    font-family:var(--font-serif);
     font-weight:700;
     font-size:11px;
-    letter-spacing:.3px;
+    letter-spacing:.5px;
     line-height:1.35;
-    box-shadow:
-      4px 4px 9px var(--neu-dark, rgba(182,166,133,0.55)),
-      -4px -4px 9px var(--neu-light, rgba(255,255,255,0.75));
+    text-shadow:0 1px 0 rgba(0,0,0,0.4);
+    box-shadow:0 4px 10px rgba(0,0,0,0.35), inset 0 0 5px rgba(0,0,0,0.35), inset 0 1px 1px rgba(255,255,255,0.2);
     z-index:5;
-    max-width:96px;
+    max-width:100px;
     text-align:center;
   }
   .yakiin-stamp::before{
-    content:'✦'; position:absolute; top:-9px; left:50%; transform:translateX(-50%);
-    font-size:11px; color:var(--stamp-accent, var(--bengara)); background:var(--paper);
-    padding:0 4px; pointer-events:none;
+    content:''; position:absolute; inset:3px; border:1px solid rgba(255,238,214,0.32); border-radius:3px; pointer-events:none;
   }
 
 
@@ -631,7 +653,7 @@
   .pstamp .pcenter{
     position:absolute; background:#F2E9DA;
     display:flex; align-items:center; justify-content:center;
-    font-family:'Shippori Mincho', serif; font-weight:700; color:#8B3A2B; text-align:center; line-height:1.3;
+    font-family:var(--font-serif); font-weight:700; color:#8B3A2B; text-align:center; line-height:1.3;
     box-shadow:0 4px 10px rgba(27,42,56,0.3);
   }
 
@@ -639,7 +661,7 @@
   .stamp-hanko{
     position:absolute;
     display:flex; align-items:center; justify-content:center; text-align:center;
-    font-family:'Shippori Mincho', serif; font-weight:700; color:#B23A2E;
+    font-family:var(--font-serif); font-weight:700; color:#B23A2E;
     line-height:1.4;
     opacity:0.92;
     mix-blend-mode:multiply;
@@ -668,7 +690,7 @@
   }
   .stamp-quick-add-form input[type="text"]{
     flex:1; border:1px solid var(--line); border-radius:8px; padding:7px 10px;
-    font-family:'Zen Kaku Gothic New', sans-serif; font-size:12.5px; background:var(--cream); color:var(--ink);
+    font-family:var(--font-sans); font-size:12.5px; background:var(--cream); color:var(--ink);
   }
   .stamp-quick-add-form button{
     flex:0 0 auto; padding:7px 14px; border-radius:8px; border:none; background:var(--ink);
@@ -712,7 +734,7 @@
   }
   .budget-edit-row input[type="number"]{
     flex:1 1 0; min-width:0; width:0; border:1px solid var(--line); border-radius:8px; padding:7px 8px;
-    font-family:'Zen Kaku Gothic New', sans-serif; font-size:13px; text-align:right;
+    font-family:var(--font-sans); font-size:13px; text-align:right;
     background:var(--cream); color:var(--ink);
   }
   .exclude-toggle{
@@ -720,11 +742,24 @@
   }
   .exclude-toggle input{ margin-top:2px; }
 
+  .font-option-list{ padding:0 16px; display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+  .font-option-item{
+    display:flex; flex-direction:column; align-items:flex-start; gap:4px;
+    padding:12px 14px; border-radius:14px; border:1.5px solid var(--line); background:var(--cream);
+    text-align:left; position:relative;
+  }
+  .font-option-item.active{ border-color:var(--bengara); background:#F4E7DF; }
+  .font-option-label{ font-size:11.5px; color:var(--ink60); }
+  .font-option-sample{ font-size:19px; color:var(--ink); }
+  .font-option-check{
+    position:absolute; top:10px; right:12px; color:var(--bengara); font-weight:700; font-size:14px;
+  }
+
   .fixed-form{ padding:4px 16px 14px; border-bottom:8px solid var(--paperDeep); }
   .fixed-form .row{ display:flex; gap:8px; margin-bottom:8px; }
   .fixed-form select, .fixed-form input{
     border:1px solid var(--line); border-radius:8px; padding:8px 10px;
-    font-family:'Zen Kaku Gothic New', sans-serif; font-size:12.5px;
+    font-family:var(--font-sans); font-size:12.5px;
     background:var(--cream); color:var(--ink);
   }
   .fixed-form .field{ flex:1; display:flex; flex-direction:column; gap:3px; }
@@ -782,7 +817,7 @@
   }
   .cat-edit-name{
     flex:1; min-width:0; width:0; border:1px solid var(--line); border-radius:8px; padding:7px 10px;
-    font-family:'Zen Kaku Gothic New', sans-serif; font-size:13px; background:white; color:var(--ink);
+    font-family:var(--font-sans); font-size:13px; background:white; color:var(--ink);
   }
   .cat-edit-save{
     flex:0 0 auto; padding:8px 12px; border-radius:8px; border:none; background:var(--ink);
@@ -826,7 +861,7 @@
   .cat-add-form .row{ display:flex; gap:8px; margin-bottom:10px; }
   .cat-add-form input[type="text"]{
     border:1px solid var(--line); border-radius:8px; padding:8px 10px;
-    font-family:'Zen Kaku Gothic New', sans-serif; font-size:13px; background:var(--cream); color:var(--ink);
+    font-family:var(--font-sans); font-size:13px; background:var(--cream); color:var(--ink);
   }
   .cat-add-form .icon-input{ width:52px; text-align:center; }
   .cat-add-form .name-input{ flex:1; }
@@ -1088,7 +1123,7 @@
     color:var(--ink60); font-size:14px; display:flex; align-items:center; justify-content:center;
   }
   .cat-manage-header .cat-manage-title{
-    font-family:'Shippori Mincho', serif; font-size:16px; color:var(--ink); font-weight:700;
+    font-family:var(--font-serif); font-size:16px; color:var(--ink); font-weight:700;
   }
   .cat-new-btn{
     width:100%; padding:13px 0; border-radius:14px; border:1.5px dashed var(--gold);
@@ -1263,6 +1298,7 @@ let state = {
   excludeUnbudgeted: false,
   showDiningStat: true,
   showBentoOption: false,
+  selectedFont: "default",
 
   fcType: "expense",
   fcCat: "housing",
@@ -1454,6 +1490,7 @@ function getPersistData(){
     excludeUnbudgeted: state.excludeUnbudgeted,
     showDiningStat: state.showDiningStat,
     showBentoOption: state.showBentoOption,
+    selectedFont: state.selectedFont,
   };
 }
 
@@ -1513,7 +1550,24 @@ function renderAuthScreen(){
   `;
 }
 
+const FONT_OPTIONS = {
+  default: { label: "標準（シッポリ明朝／Zen角ゴ）", serif:"'Shippori Mincho', serif", sans:"'Zen Kaku Gothic New', sans-serif" },
+  cinecaption: { label: "cinecaption", serif:"'cinecaption', serif", sans:"'cinecaption', sans-serif" },
+  wdxl: { label: "WDXL Lubrifont JP N", serif:"'WDXL Lubrifont JP N', sans-serif", sans:"'WDXL Lubrifont JP N', sans-serif" },
+  shimbashi: { label: "しんばしゴチック", serif:"'ShimbashiGothic', sans-serif", sans:"'ShimbashiGothic', sans-serif" },
+  chika: { label: "chika", serif:"'chika', sans-serif", sans:"'chika', sans-serif" },
+};
+
+function applySelectedFont(){
+  const phoneEl = document.querySelector(".phone");
+  if(!phoneEl) return;
+  const opt = FONT_OPTIONS[state.selectedFont] || FONT_OPTIONS.default;
+  phoneEl.style.setProperty("--font-serif", opt.serif);
+  phoneEl.style.setProperty("--font-sans", opt.sans);
+}
+
 function render(){
+  applySelectedFont();
   const c = document.getElementById("content");
   const navEl = document.getElementById("nav");
 
@@ -2572,6 +2626,21 @@ function renderSettings(){
         <input type="checkbox" id="showBentoToggle" ${state.showBentoOption ? 'checked' : ''} />
         <span>「弁当」の選択肢を追加する（外食／自炊に加えて選べるようになります）</span>
       </label>
+
+      <div class="report-title" style="margin-top:6px;">フォント</div>
+      <div class="font-option-list">
+        ${Object.keys(FONT_OPTIONS).map(key=>{
+          const opt = FONT_OPTIONS[key];
+          const active = state.selectedFont === key;
+          return `
+            <button class="font-option-item ${active?'active':''}" data-font="${key}" style="font-family:${opt.sans};">
+              <span class="font-option-label">${opt.label}</span>
+              <span class="font-option-sample" style="font-family:${opt.serif};">思い出家計簿 あ亜1234</span>
+              ${active ? '<span class="font-option-check">✓</span>' : ''}
+            </button>
+          `;
+        }).join("")}
+      </div>
     `;
   }
 
@@ -3238,6 +3307,9 @@ function attachHandlers(){
       if(showBentoToggle){
         showBentoToggle.onchange = (e)=>{ state.showBentoOption = e.target.checked; };
       }
+      document.querySelectorAll("[data-font]").forEach(b=>{
+        b.onclick = ()=>{ state.selectedFont = b.dataset.font; render(); };
+      });
     }
 
     if(state.settingsSubTab === "stamps"){
