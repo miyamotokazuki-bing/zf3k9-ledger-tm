@@ -585,23 +585,26 @@
 
   .yakiin-stamp{
     position:absolute;
-    padding:7px 11px;
-    background:linear-gradient(155deg,#5c3220,#3a1c10);
-    border:2px solid rgba(255,255,255,0.12);
-    border-radius:4px;
-    color:#EADFC8;
+    padding:8px 12px;
+    background:
+      repeating-linear-gradient(95deg, rgba(0,0,0,0.08) 0px, transparent 2px, transparent 7px),
+      linear-gradient(155deg,#6b4028,#4a2818 55%,#2e1a0d);
+    border:2px solid rgba(234,223,200,0.4);
+    border-radius:5px;
+    color:#EFDFC5;
     font-family:'Shippori Mincho', serif;
     font-weight:700;
     font-size:11px;
     letter-spacing:.5px;
-    line-height:1.3;
-    box-shadow:0 3px 8px rgba(0,0,0,0.4), inset 0 0 4px rgba(0,0,0,0.5);
+    line-height:1.35;
+    text-shadow:0 1px 0 rgba(0,0,0,0.5);
+    box-shadow:0 4px 10px rgba(0,0,0,0.4), inset 0 0 5px rgba(0,0,0,0.5);
     z-index:5;
-    max-width:120px;
+    max-width:100px;
     text-align:center;
   }
   .yakiin-stamp::before{
-    content:''; position:absolute; inset:3px; border:1px solid rgba(234,223,200,0.35); border-radius:2px; pointer-events:none;
+    content:''; position:absolute; inset:3px; border:1px solid rgba(234,223,200,0.28); border-radius:3px; pointer-events:none;
   }
 
 
@@ -1062,6 +1065,35 @@
     background:var(--paper);
     box-shadow: 2px 2px 4px var(--neu-dark), -2px -2px 4px var(--neu-light);
   }
+
+  .cat-manage-backdrop{ z-index:21; }
+  .cat-manage-sheet{ z-index:22; height:74%; }
+  .cat-add-backdrop{ z-index:23; }
+  .cat-add-sheet{ z-index:24; height:66%; }
+
+  .cat-manage-header{
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;
+  }
+  .cat-manage-header .cat-manage-close{
+    width:32px; height:32px; border-radius:50%; border:none; background:var(--paperDeep);
+    color:var(--ink60); font-size:14px; display:flex; align-items:center; justify-content:center;
+  }
+  .cat-manage-header .cat-manage-title{
+    font-family:'Shippori Mincho', serif; font-size:16px; color:var(--ink); font-weight:700;
+  }
+  .cat-new-btn{
+    width:100%; padding:13px 0; border-radius:14px; border:1.5px dashed var(--gold);
+    background:rgba(180,134,62,0.08); color:var(--gold); font-weight:700; font-size:13.5px;
+    margin-bottom:12px;
+  }
+  .cat-manage-sheet .cat-list{
+    flex:1; overflow-y:auto; margin:0 -16px; padding:0 16px;
+  }
+  .cat-edit-tile{ opacity:0.62; }
+  .cat-edit-tile .cat-edit-plus{
+    font-size:20px; font-weight:700; color:var(--ink60);
+  }
+  .cat-edit-tile .name{ color:var(--ink60); }
 </style>
 </head>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -1098,6 +1130,10 @@
   <div class="calc-sheet" id="calcSheet"></div>
   <div class="calc-backdrop" id="datePickerBackdrop"></div>
   <div class="calc-sheet" id="datePickerSheet"></div>
+  <div class="calc-backdrop cat-manage-backdrop" id="catManageBackdrop"></div>
+  <div class="calc-sheet cat-manage-sheet" id="catManageSheet"></div>
+  <div class="calc-backdrop cat-add-backdrop" id="catAddBackdrop"></div>
+  <div class="calc-sheet cat-add-sheet" id="catAddSheet"></div>
   <button class="stamp-complete-btn" id="stampCompleteBtn">完了</button>
 </div>
 
@@ -1174,6 +1210,8 @@ let state = {
   receiptLoading: false,
   calcOpen: false,
   catQuickAddOpen: false,
+  catManageOpen: false,
+  catAddOpen: false,
   datePickerOpen: false,
   datePickerYear: 2026,
   datePickerMonth: 8,
@@ -1496,6 +1534,8 @@ function render(){
   if(state.tab==="settings") c.innerHTML = `<div class="settings-neu">${renderSettings()}</div>`;
   renderCalcSheet();
   renderDatePickerSheet();
+  renderCatManageSheet();
+  renderCatAddSheet();
 
   const stampActive = state.tab === "memory" && state.reflectionMode;
   const stampScreenFrame = document.getElementById("stampScreenFrame");
@@ -1678,7 +1718,7 @@ function renderInput(){
         </button>
       `).join("")}
       <button class="cat-btn cat-edit-tile" id="catManageBtn">
-        <span class="emoji">✏️</span>
+        <span class="emoji cat-edit-plus">＋</span>
         <span class="name">編集・追加</span>
       </button>
     </div>
@@ -2188,11 +2228,10 @@ function renderMemory(){
         const stampBadgesHtml = txStamps.map((s,si)=>{
           const group = Math.floor(si/2);
           const dir = si%2===0 ? 1 : -1;
-          const offX = dir * (34 + group*44);
+          const offX = dir * (26 + group*36);
           const offY = group * 8;
           const rot = si%2===0 ? -6 : 5;
-          const posStyle = `left:calc(50% + ${offX}px); top:calc(56% + ${offY}px); transform:translate(-50%,-50%) rotate(${rot}deg); z-index:${6+si};`;
-          return renderHankoStamp(s.name, posStyle);
+          return `<div class="yakiin-stamp" style="left:calc(50% + ${offX}px); top:calc(56% + ${offY}px); transform:translate(-50%,-50%) rotate(${rot}deg); z-index:${6+si};">${s.name}</div>`;
         }).join("");
 
         return `
@@ -2213,6 +2252,117 @@ function renderMemory(){
 }
 
 // ---------- SETTINGS ----------
+function buildCategoryListHtml(){
+  return state.categories.map(c=>{
+    const isSelected = state.catSelectedIds.includes(c.id);
+    const clickAttr = state.catSelectMode ? `data-cat-select="${c.id}"` : "";
+
+    if(state.editingCatId === c.id){
+      return `
+      <div class="cat-list-item editing-cat" data-cat-id="${c.id}" data-cat-type="${c.type}">
+        <input type="text" class="cat-edit-icon" id="catEditIcon" maxlength="2" value="${state.editCatIcon}" />
+        <input type="text" class="cat-edit-name" id="catEditName" value="${state.editCatName}" />
+        <button class="cat-edit-save" data-cat-save="${c.id}">保存</button>
+        <button class="cat-edit-cancel" data-cat-cancel="${c.id}">✕</button>
+      </div>
+    `;
+    }
+
+    return `
+    <div class="cat-list-item ${state.catSelectMode?'selectable':''} ${isSelected?'selected':''}" ${clickAttr} data-cat-id="${c.id}" data-cat-type="${c.type}">
+      ${state.catSelectMode ? `<span class="cat-checkbox ${isSelected?'checked':''}">${isSelected?'✓':''}</span>` : ''}
+      <span class="swatch" style="background:${c.color}"></span>
+      <span class="nm" ${!state.catSelectMode ? `data-cat-edit-open="${c.id}"` : ''}>${c.icon} ${c.name}
+        <span class="type-tag ${c.type}">${c.type==='income'?'収入':'支出'}</span>
+        ${c.diningOutEnabled ? '<span class="dine-tag">外食チェック</span>' : ''}
+      </span>
+      ${!state.catSelectMode ? `
+        <span class="cat-drag-handle" data-cat-drag="${c.id}">⠿</span>
+      ` : ''}
+    </div>
+  `;
+  }).join("");
+}
+
+function renderCatManageSheet(){
+  const sheet = document.getElementById("catManageSheet");
+  const backdrop = document.getElementById("catManageBackdrop");
+  if(!sheet || !backdrop) return;
+  if(state.catManageOpen){
+    sheet.classList.add("open");
+    backdrop.classList.add("open");
+
+    const selectBarHtml = `
+      <div class="cat-select-bar">
+        <button class="cat-select-toggle ${state.catSelectMode?'on':''}" id="catSelectModeToggle">${state.catSelectMode ? '完了' : '編集'}</button>
+        ${state.catSelectMode ? `<button class="cat-delete-selected-btn" id="catDeleteSelectedBtn" ${state.catSelectedIds.length===0?'disabled':''}>${state.catSelectedIds.length}件を削除</button>` : ''}
+      </div>
+    `;
+    const confirmHtml = state.catDeleteConfirm ? `
+      <div class="cat-delete-confirm">
+        <p>選択した${state.catSelectedIds.length}件のジャンルを削除しますか？<br>関連する記録・固定費は「その他」に振り替わります。</p>
+        <div class="row">
+          <button class="btn-confirm" id="catDeleteConfirmBtn">削除する</button>
+          <button class="btn-cancel" id="catDeleteCancelBtn">キャンセル</button>
+        </div>
+      </div>
+    ` : "";
+
+    sheet.innerHTML = `
+      <div class="calc-sheet-handle"></div>
+      <div class="cat-manage-header">
+        <button class="cat-manage-close" id="catManageCloseBtn">✕</button>
+        <span class="cat-manage-title">カテゴリー</span>
+        <span style="width:32px;"></span>
+      </div>
+      <button class="cat-new-btn" id="catNewBtn">＋ 新規カテゴリー</button>
+      ${selectBarHtml}
+      ${confirmHtml}
+      <div class="cat-list">${buildCategoryListHtml()}</div>
+    `;
+  } else {
+    sheet.classList.remove("open");
+    backdrop.classList.remove("open");
+  }
+}
+
+function renderCatAddSheet(){
+  const sheet = document.getElementById("catAddSheet");
+  const backdrop = document.getElementById("catAddBackdrop");
+  if(!sheet || !backdrop) return;
+  if(state.catAddOpen){
+    sheet.classList.add("open");
+    backdrop.classList.add("open");
+    sheet.innerHTML = `
+      <div class="calc-sheet-handle"></div>
+      <div class="cat-manage-header">
+        <button class="cat-manage-close" id="catAddCloseBtn">✕</button>
+        <span class="cat-manage-title">新規カテゴリー</span>
+        <span style="width:32px;"></span>
+      </div>
+      <div class="switch" style="margin-bottom:12px;">
+        <button data-newcattype="expense" class="${state.newCatType==='expense'?'active':''}">支出</button>
+        <button data-newcattype="income" class="${state.newCatType==='income'?'active':''}">収入</button>
+      </div>
+      <div class="row">
+        <input type="text" class="icon-input" id="newCatIcon" maxlength="2" value="${state.newCatIcon}" />
+        <input type="text" class="name-input" id="newCatName" placeholder="カテゴリ名" value="${state.newCatName}" />
+      </div>
+      <div class="swatches">
+        ${COLOR_PRESETS.map(col=>`<button class="swatch-btn ${state.newCatColor===col?'selected':''}" data-swatch="${col}" style="background:${col}"></button>`).join("")}
+      </div>
+      <label class="dine-check">
+        <input type="checkbox" id="newCatDining" ${state.newCatDining?'checked':''} />
+        <span>選択時に「外食 / 自炊」を選べるようにする（食費用の項目に）</span>
+      </label>
+      <button class="add-btn" id="catAddSubmitBtn">追加する</button>
+    `;
+  } else {
+    sheet.classList.remove("open");
+    backdrop.classList.remove("open");
+  }
+}
+
 function renderSettings(){
   const sub = `
     <div class="settings-sub">
@@ -2530,8 +2680,7 @@ function attachHandlers(){
     const catManageBtn = document.getElementById("catManageBtn");
     if(catManageBtn){
       catManageBtn.onclick = ()=>{
-        state.tab = "settings";
-        state.settingsSubTab = "category";
+        state.catManageOpen = true;
         render();
       };
     }
@@ -2925,11 +3074,15 @@ function attachHandlers(){
   if(state.tab==="settings"){
     document.querySelectorAll("[data-sub]").forEach(b=>{
       b.onclick = ()=>{
-        state.settingsSubTab = b.dataset.sub;
         state.catSelectMode = false;
         state.catSelectedIds = [];
         state.catDeleteConfirm = false;
         state.accountDeleteConfirm = false;
+        if(b.dataset.sub === "category"){
+          state.catManageOpen = true;
+        } else {
+          state.settingsSubTab = b.dataset.sub;
+        }
         render();
       };
     });
@@ -3146,7 +3299,7 @@ function attachHandlers(){
       });
     }
 
-    if(state.settingsSubTab === "category"){
+    if(false){
       document.querySelectorAll("[data-cat-edit-open]").forEach(nm=>{
         nm.onclick = ()=>{
           const id = nm.dataset.catEditOpen;
@@ -3360,6 +3513,235 @@ function attachHandlers(){
   const gearBtn = document.getElementById("gearBtn");
   if(gearBtn){
     gearBtn.onclick = ()=>{ state.tab = "settings"; render(); };
+  }
+
+  // カテゴリ管理シート（どのタブからも開けるため、タブ判定の外側で処理）
+  document.querySelectorAll("[data-cat-edit-open]").forEach(nm=>{
+    nm.onclick = ()=>{
+      const id = nm.dataset.catEditOpen;
+      const cat = state.categories.find(c=>c.id===id);
+      if(!cat) return;
+      state.editingCatId = id;
+      state.editCatIcon = cat.icon;
+      state.editCatName = cat.name;
+      render();
+    };
+  });
+
+  const catEditIcon = document.getElementById("catEditIcon");
+  const catEditName = document.getElementById("catEditName");
+  if(catEditIcon) catEditIcon.oninput = (e)=>{ state.editCatIcon = e.target.value; };
+  if(catEditName) catEditName.oninput = (e)=>{ state.editCatName = e.target.value; };
+
+  document.querySelectorAll("[data-cat-save]").forEach(b=>{
+    b.onclick = ()=>{
+      const id = b.dataset.catSave;
+      const cat = state.categories.find(c=>c.id===id);
+      if(cat){
+        const trimmedName = (state.editCatName || "").trim();
+        if(trimmedName) cat.name = trimmedName;
+        cat.icon = state.editCatIcon || cat.icon;
+      }
+      state.editingCatId = null;
+      render();
+    };
+  });
+  document.querySelectorAll("[data-cat-cancel]").forEach(b=>{
+    b.onclick = ()=>{ state.editingCatId = null; render(); };
+  });
+
+  document.querySelectorAll("[data-cat-drag]").forEach(handle=>{
+    handle.onpointerdown = (e)=>{
+      e.preventDefault();
+      const dragId = handle.dataset.catDrag;
+      const dragCat = state.categories.find(c=>c.id===dragId);
+      if(!dragCat) return;
+      const itemEl = handle.closest(".cat-list-item");
+      if(itemEl) itemEl.classList.add("dragging");
+
+      let indicator = document.getElementById("catDropIndicator");
+      if(!indicator){
+        indicator = document.createElement("div");
+        indicator.id = "catDropIndicator";
+        indicator.className = "cat-drop-indicator";
+        document.body.appendChild(indicator);
+      }
+
+      let pendingInsertBeforeId = undefined;
+
+      const onMove = (moveEvt)=>{
+        const y = moveEvt.clientY;
+        const items = Array.from(document.querySelectorAll(`.cat-list-item[data-cat-type="${dragCat.type}"]`))
+          .filter(el=>el.dataset.catId !== dragId);
+        if(items.length === 0) return;
+
+        let insertBeforeEl = null;
+        for(const el of items){
+          const rect = el.getBoundingClientRect();
+          const mid = rect.top + rect.height/2;
+          if(y < mid){ insertBeforeEl = el; break; }
+        }
+
+        const listRect = items[0].getBoundingClientRect();
+        const containerLeft = listRect.left;
+        const containerWidth = listRect.width;
+
+        let lineTop;
+        if(insertBeforeEl){
+          lineTop = insertBeforeEl.getBoundingClientRect().top - 2;
+          pendingInsertBeforeId = insertBeforeEl.dataset.catId;
+        } else {
+          const lastRect = items[items.length-1].getBoundingClientRect();
+          lineTop = lastRect.bottom - 2;
+          pendingInsertBeforeId = null;
+        }
+
+        indicator.style.display = "block";
+        indicator.style.left = containerLeft + "px";
+        indicator.style.width = containerWidth + "px";
+        indicator.style.top = lineTop + "px";
+      };
+
+      const onUp = ()=>{
+        document.removeEventListener("pointermove", onMove);
+        document.removeEventListener("pointerup", onUp);
+        document.removeEventListener("pointercancel", onUp);
+        indicator.style.display = "none";
+
+        if(pendingInsertBeforeId !== undefined){
+          const fromIdx = state.categories.findIndex(c=>c.id===dragId);
+          if(fromIdx >= 0){
+            const [moved] = state.categories.splice(fromIdx, 1);
+            if(pendingInsertBeforeId === null){
+              let lastIdxOfType = -1;
+              state.categories.forEach((c,i)=>{ if(c.type===dragCat.type) lastIdxOfType = i; });
+              state.categories.splice(lastIdxOfType+1, 0, moved);
+            } else {
+              const toIdx = state.categories.findIndex(c=>c.id===pendingInsertBeforeId);
+              state.categories.splice(toIdx >= 0 ? toIdx : state.categories.length, 0, moved);
+            }
+          }
+        }
+        render();
+      };
+      document.addEventListener("pointermove", onMove);
+      document.addEventListener("pointerup", onUp);
+      document.addEventListener("pointercancel", onUp);
+    };
+  });
+
+  const catSelectModeToggle = document.getElementById("catSelectModeToggle");
+  if(catSelectModeToggle){
+    catSelectModeToggle.onclick = ()=>{
+      state.catSelectMode = !state.catSelectMode;
+      state.catSelectedIds = [];
+      state.catDeleteConfirm = false;
+      state.editingCatId = null;
+      render();
+    };
+  }
+
+  document.querySelectorAll("[data-cat-select]").forEach(item=>{
+    item.onclick = ()=>{
+      const id = item.dataset.catSelect;
+      const idx = state.catSelectedIds.indexOf(id);
+      if(idx >= 0) state.catSelectedIds.splice(idx, 1);
+      else state.catSelectedIds.push(id);
+      render();
+    };
+  });
+
+  const catDeleteSelectedBtn = document.getElementById("catDeleteSelectedBtn");
+  if(catDeleteSelectedBtn){
+    catDeleteSelectedBtn.onclick = ()=>{
+      if(state.catSelectedIds.length === 0) return;
+      state.catDeleteConfirm = true;
+      render();
+    };
+  }
+
+  const catDeleteConfirmBtn = document.getElementById("catDeleteConfirmBtn");
+  if(catDeleteConfirmBtn){
+    catDeleteConfirmBtn.onclick = ()=>{
+      const idsToDelete = state.catSelectedIds.filter(id => state.categories.length - state.catSelectedIds.length >= 1);
+      idsToDelete.forEach(delId=>{
+        if(state.categories.length <= 1) return;
+        const delCat = state.categories.find(c=>c.id===delId);
+        if(!delCat) return;
+        state.categories = state.categories.filter(c=>c.id !== delId);
+        delete state.budgets[delId];
+        const fallback = state.categories.find(c=>c.type===delCat.type) || state.categories[0];
+        state.transactions.forEach(t=>{ if(t.categoryId===delId) t.categoryId = fallback.id; });
+        state.fixedCosts.forEach(fc=>{ if(fc.categoryId===delId) fc.categoryId = fallback.id; });
+        if(state.inputCat===delId) state.inputCat = fallback.id;
+        if(state.fcCat===delId) state.fcCat = fallback.id;
+      });
+      state.catSelectedIds = [];
+      state.catSelectMode = false;
+      state.catDeleteConfirm = false;
+      render();
+    };
+  }
+  const catDeleteCancelBtn = document.getElementById("catDeleteCancelBtn");
+  if(catDeleteCancelBtn){
+    catDeleteCancelBtn.onclick = ()=>{ state.catDeleteConfirm = false; render(); };
+  }
+
+  const catManageCloseBtn = document.getElementById("catManageCloseBtn");
+  if(catManageCloseBtn){
+    catManageCloseBtn.onclick = ()=>{ state.catManageOpen = false; render(); };
+  }
+  const catManageBackdrop = document.getElementById("catManageBackdrop");
+  if(catManageBackdrop){
+    catManageBackdrop.onclick = ()=>{ if(state.catManageOpen){ state.catManageOpen = false; render(); } };
+  }
+  const catNewBtn = document.getElementById("catNewBtn");
+  if(catNewBtn){
+    catNewBtn.onclick = ()=>{ state.catAddOpen = true; render(); };
+  }
+
+  document.querySelectorAll("[data-newcattype]").forEach(b=>{
+    b.onclick = ()=>{ state.newCatType = b.dataset.newcattype; render(); };
+  });
+
+  const newCatIcon = document.getElementById("newCatIcon");
+  const newCatName = document.getElementById("newCatName");
+  const newCatDining = document.getElementById("newCatDining");
+  if(newCatIcon) newCatIcon.oninput = (e)=>{ state.newCatIcon = e.target.value; };
+  if(newCatName) newCatName.oninput = (e)=>{ state.newCatName = e.target.value; };
+  if(newCatDining) newCatDining.onchange = (e)=>{ state.newCatDining = e.target.checked; };
+
+  document.querySelectorAll("[data-swatch]").forEach(b=>{
+    b.onclick = ()=>{ state.newCatColor = b.dataset.swatch; render(); };
+  });
+
+  const catAddSubmitBtn = document.getElementById("catAddSubmitBtn");
+  if(catAddSubmitBtn){
+    catAddSubmitBtn.onclick = ()=>{
+      const name = (state.newCatName || "").trim();
+      if(!name) return;
+      state.categories.push({
+        id: uid("cat"),
+        name,
+        icon: state.newCatIcon || "🏷️",
+        color: state.newCatColor,
+        type: state.newCatType,
+        diningOutEnabled: state.newCatDining
+      });
+      state.newCatName = "";
+      state.newCatIcon = "🏷️";
+      state.newCatDining = false;
+      state.catAddOpen = false;
+      render();
+    };
+  }
+  const catAddCloseBtn = document.getElementById("catAddCloseBtn");
+  if(catAddCloseBtn){
+    catAddCloseBtn.onclick = ()=>{ state.catAddOpen = false; render(); };
+  }
+  const catAddBackdrop = document.getElementById("catAddBackdrop");
+  if(catAddBackdrop){
+    catAddBackdrop.onclick = ()=>{ if(state.catAddOpen){ state.catAddOpen = false; render(); } };
   }
 
   // 電卓ボトムシート（どのタブの上にも被さるため、他のタブブロックの外側で処理）
