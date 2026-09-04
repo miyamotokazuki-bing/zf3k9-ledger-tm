@@ -50,6 +50,7 @@
     --font-sans:'Zen Kaku Gothic New', sans-serif;
   }
   *{box-sizing:border-box;}
+  button, input, textarea, select{ font-family:inherit; }
   body{
     margin:0;
     min-height:100vh;
@@ -1559,11 +1560,9 @@ const FONT_OPTIONS = {
 };
 
 function applySelectedFont(){
-  const phoneEl = document.querySelector(".phone");
-  if(!phoneEl) return;
   const opt = FONT_OPTIONS[state.selectedFont] || FONT_OPTIONS.default;
-  phoneEl.style.setProperty("--font-serif", opt.serif);
-  phoneEl.style.setProperty("--font-sans", opt.sans);
+  document.documentElement.style.setProperty("--font-serif", opt.serif);
+  document.documentElement.style.setProperty("--font-sans", opt.sans);
 }
 
 function render(){
