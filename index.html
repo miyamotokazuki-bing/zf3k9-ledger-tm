@@ -365,6 +365,19 @@
   }
   .save-btn.saved{ background:var(--moss); }
 
+  .add-btn{
+    width:100%; padding:13px 0; border-radius:12px; border:none;
+    background:var(--ink); color:var(--cream); font-weight:700; font-size:13.5px; cursor:pointer;
+    margin-top:4px;
+  }
+  .add-btn:disabled{ opacity:0.4; cursor:default; }
+
+  .calc-ok-btn{
+    width:100%; padding:14px 0; border:none; border-radius:12px; cursor:pointer;
+    background:var(--ink); color:var(--cream); font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+
   /* ---- Calendar tab ---- */
   .cal-head{
     display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;
@@ -424,6 +437,7 @@
   .dining-stat .d-item{ font-size:11.5px; color:var(--ink60); white-space:nowrap; }
   .dining-stat .d-item b{ font-size:13px; color:var(--ink); font-weight:700; }
   .dining-stat .d-item b.d-red{ color:var(--bengara); }
+  .dining-stat .d-item b.d-green{ color:var(--moss); }
 
   .report-title{ font-family:var(--font-serif); font-size:15px; color:var(--ink); margin:0 0 10px; padding:0 16px;}
   .stamp-period-toggle{ display:flex; gap:4px; flex:0 0 auto; }
@@ -819,6 +833,17 @@
     flex:0 0 auto; width:32px; height:32px; border-radius:8px; border:none; background:var(--paperDeep);
     color:var(--ink60); font-size:13px; cursor:pointer;
   }
+  .icon-input{
+    width:48px; flex:0 0 auto; border:1px solid var(--line); border-radius:10px; padding:9px 4px;
+    text-align:center; font-size:17px; background:var(--cream); color:var(--ink);
+  }
+  .icon-input::placeholder{ font-size:10.5px; color:var(--ink40); }
+  .name-input{
+    flex:1; min-width:0; width:0; border:1px solid var(--line); border-radius:10px; padding:9px 12px;
+    font-family:var(--font-sans); font-size:13.5px; background:var(--cream); color:var(--ink);
+  }
+  .name-input::placeholder{ color:var(--ink40); }
+  .row{ display:flex; gap:8px; margin-bottom:10px; }
 
   .cat-select-bar{ display:flex; gap:8px; padding:0 16px 10px; align-items:center; }
   .cat-select-toggle{
@@ -1128,7 +1153,17 @@
   .cat-edit-tile .cat-edit-plus{
     font-size:20px; font-weight:700; color:var(--ink60);
   }
-  .cat-edit-tile .name{ color:var(--ink60); }
+  .cat-edit-tile .name{ color:var(--ink60); }  /* kurobara-cinderella選択時：文字が細く小さく見えるため主要な読み物箇所を拡大 */
+  .font-boost .cmt{ font-size:16px; line-height:1.85; }
+  .font-boost .badge{ font-size:12.5px; }
+  .font-boost .amt{ font-size:15px; }
+  .font-boost .date{ font-size:11.5px; }
+  .font-boost .headline, .font-boost .ym{ font-size:19px; }
+  .font-boost .report-title{ font-size:17px; }
+  .font-boost .cat-btn .name{ font-size:12.5px; }
+  .font-boost .font-option-sample{ font-size:22px; }
+  .font-boost .save-btn, .font-boost .add-btn{ font-size:15.5px; }
+  .font-boost .yakiin-stamp{ font-size:12.5px; }
 </style>
 </head>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -1276,6 +1311,7 @@ let state = {
   reflectionMode: false,
   activeStampId: null,
   expandedStampId: null,
+  reportStampFilter: null,
   stampReportView: "month",
   stampQuickAddOpen: false,
   newStampIcon: "🏷️",
@@ -1288,7 +1324,7 @@ let state = {
   budgets: { food: 30000, cafe: 5000, hobby: 8000 },
   excludeUnbudgeted: false,
   showDiningStat: true,
-  showBentoOption: false,
+  showBentoOption: true,
   selectedFont: "default",
 
   fcType: "expense",
@@ -1309,10 +1345,7 @@ let state = {
   catSelectedIds: [],
   catDeleteConfirm: false,
 
-  fixedCosts: [
-    { id:"fc1", type:"expense", categoryId:"housing", amount:68000, day:1, endDate:null, memo:"家賃" },
-    { id:"fc2", type:"income", categoryId:"salary", amount:250000, day:25, endDate:null, memo:"給与" },
-  ],
+  fixedCosts: [],
 
   transactions: [
     { id:"t1", date:"2026-08-02", type:"expense", categoryId:"travel", amount:3200,
@@ -1551,6 +1584,7 @@ function applySelectedFont(){
   const opt = FONT_OPTIONS[state.selectedFont] || FONT_OPTIONS.default;
   document.documentElement.style.setProperty("--font-serif", opt.serif);
   document.documentElement.style.setProperty("--font-sans", opt.sans);
+  document.documentElement.classList.toggle("font-boost", state.selectedFont === "kurobara");
 }
 
 function render(){
@@ -1726,7 +1760,13 @@ function renderNav(){
     </button>
   `).join("");
   nav.querySelectorAll("button").forEach(b=>{
-    b.onclick = ()=>{ state.tab = b.dataset.tab; state.calcOpen = false; state.datePickerOpen = false; render(); };
+    b.onclick = ()=>{
+      if(b.dataset.tab !== "report") state.reportStampFilter = null;
+      state.tab = b.dataset.tab;
+      state.calcOpen = false;
+      state.datePickerOpen = false;
+      render();
+    };
   });
 }
 
@@ -1953,6 +1993,29 @@ function renderWeekView(){
 function renderReport(){
   const year = state.cursorYear, month = state.cursorMonth;
   const monthKey = `${year}-${String(month+1).padStart(2,'0')}`;
+
+  if(state.reportStampFilter){
+    const stamp = state.stamps.find(s=>s.id===state.reportStampFilter);
+    if(!stamp){
+      state.reportStampFilter = null;
+    } else {
+      const periodKey = state.stampReportView === "year" ? `${year}-` : monthKey;
+      const periodLabel = state.stampReportView === "year" ? `${year}年` : `${year}年${month+1}月`;
+      const matched = state.transactions.filter(t=> (t.stamps||[]).includes(stamp.id) && t.date.startsWith(periodKey) && !t.isExample);
+      const cardsHtml = buildSimpleMemoryCards(matched);
+      return `
+        <div class="memory-neu">
+          <div class="memory-month-nav">
+            <button class="nav-round" id="stampFilterBackBtn">‹</button>
+            <span class="ym">${stamp.icon} ${stamp.name}（${periodLabel}）</span>
+            <span style="width:34px;"></span>
+          </div>
+          <div class="memories">${cardsHtml}</div>
+        </div>
+      `;
+    }
+  }
+
   const realMonthTx = state.transactions.filter(t=>t.date.startsWith(monthKey) && !t.isExample);
   const monthTx = realMonthTx.concat(fixedTxForMonth(year, month));
 
@@ -2029,31 +2092,16 @@ function renderReport(){
   const stampRowsHtml = state.stamps.map(s=>{
     const matched = state.transactions.filter(t=> (t.stamps||[]).includes(s.id) && t.date.startsWith(stampPeriodKey) && !t.isExample);
     const totalAmt = matched.reduce((sum,t)=>sum + t.amount, 0);
-    const isOpen = state.expandedStampId === s.id;
-    const detailHtml = isOpen ? matched
-      .slice()
-      .sort((a,b)=> a.date < b.date ? 1 : -1)
-      .map(t=>{
-        const c = catOf(t.categoryId);
-        return `
-          <div class="stamp-detail-item">
-            <span class="d">${t.date}</span>
-            <span class="c">${c.icon} ${t.comment ? t.comment.slice(0,20) + (t.comment.length>20?'…':'') : c.name}</span>
-            <span class="a">${yen(t.amount)}</span>
-          </div>
-        `;
-      }).join("") : "";
     return `
-      <div class="stamp-report-row" data-stamp-expand="${s.id}">
+      <div class="stamp-report-row" data-stamp-filter="${s.id}">
         <span class="icon">${s.icon}</span>
         <span class="nm">${s.name}</span>
         <span class="cnt-amt">
           <span class="amt-total">${yen(totalAmt)}</span>
           <span class="cnt">${matched.length}件</span>
         </span>
-        <span class="chev ${isOpen?'open':''}">▶</span>
+        <span class="chev">▶</span>
       </div>
-      ${detailHtml}
     `;
   }).join("");
 
@@ -2081,9 +2129,9 @@ function renderReport(){
         </div>
         ${(state.showDiningStat && diningCatIds.length>0) ? `
         <div class="dining-stat">
-          <span class="d-item">🍽 外食 <b class="d-red">${diningOutCount}</b>回</span>
-          ${state.showBentoOption ? `<span class="d-item">🍱 弁当 <b class="d-red">${bentoCount}</b>回</span>` : ''}
-          <span class="d-item">🏠 自炊 <b>${selfCookCount}</b>回</span>
+          <span class="d-item">🍽 外食 <b>${diningOutCount}</b>回</span>
+          ${state.showBentoOption ? `<span class="d-item">🍱 弁当 <b>${bentoCount}</b>回</span>` : ''}
+          <span class="d-item">🏠 自炊 <b class="d-green">${selfCookCount}</b>回</span>
         </div>` : ''}
       </div>
       <div class="report-title collapsible" data-toggle-catsection>
@@ -2132,7 +2180,7 @@ function renderReport(){
         </div>
       ` : ''}
 
-      <div class="report-title">予算の消化状況</div>
+      <div class="report-title">今月の予算の消化状況</div>
       ${budgetCats.length===0 ? `<div class="empty">設定タブから予算を登録できます</div>` : `
         <div class="budget-section">
           ${budgetRowsHtml}
@@ -2160,6 +2208,36 @@ function renderReport(){
 }
 
 // ---------- MEMORY ----------
+function buildSimpleMemoryCards(txList){
+  if(txList.length === 0) return `<div class="empty">この期間には該当する記録がありません</div>`;
+  return txList.slice().sort((a,b)=> a.date < b.date ? 1 : -1).map((t,i)=>{
+    const c = catOf(t.categoryId);
+    const rotate = i%2===0 ? -1.2 : 1.4;
+    const txStamps = (t.stamps || []).map(sid=>state.stamps.find(s=>s.id===sid)).filter(Boolean);
+    const stampBadgesHtml = txStamps.map((s,si)=>{
+      const group = Math.floor(si/2);
+      const dir = si%2===0 ? 1 : -1;
+      const offX = dir * (26 + group*36);
+      const offY = group * 8;
+      const rot = si%2===0 ? -6 : 5;
+      const accent = stampAccentColor(s.id);
+      return `<div class="yakiin-stamp" style="left:calc(50% + ${offX}px); top:calc(56% + ${offY}px); transform:translate(-50%,-50%) rotate(${rot}deg); z-index:${6+si}; --stamp-accent:${accent};">${s.name}</div>`;
+    }).join("");
+    return `
+      <div class="memory-card" style="transform:rotate(${rotate}deg)" data-open-memory-report="${t.id}">
+        ${stampBadgesHtml}
+        <div class="top">
+          <span class="badge" style="background:${c.color}">${c.icon} ${c.name}</span>
+          <span class="date">${t.date}</span>
+          <span class="amt" style="color:${t.type==='income'?TOKENS.moss:TOKENS.bengara}">${t.type==='income'?'+':'-'}${yen(t.amount)}</span>
+        </div>
+        ${t.photo ? `<img src="${t.photo}" />` : ''}
+        <div class="cmt ${t.comment?'':'cmt-empty'}">${t.comment || '例：店の名前、一言思い出。'}</div>
+      </div>
+    `;
+  }).join("");
+}
+
 function renderMemory(){
   let periodMemory, navHtml;
 
@@ -2406,7 +2484,7 @@ function renderCatAddSheet(){
         <button data-newcattype="income" class="${state.newCatType==='income'?'active':''}">収入</button>
       </div>
       <div class="row">
-        <input type="text" class="icon-input" id="newCatIcon" maxlength="2" value="${state.newCatIcon}" />
+        <input type="text" class="icon-input" id="newCatIcon" maxlength="2" placeholder="絵文字" value="${state.newCatIcon}" />
         <input type="text" class="name-input" id="newCatName" placeholder="カテゴリ名" value="${state.newCatName}" />
       </div>
       <div class="swatches">
@@ -2630,6 +2708,29 @@ function renderSettings(){
     `;
   }
 
+  if(state.settingsSubTab === "category"){
+    return `
+      ${sub}
+      <div style="padding:0 16px 12px;">
+        <button class="cat-new-btn" id="catNewBtn2">＋ 新規カテゴリー</button>
+        <div class="cat-select-bar">
+          <button class="cat-select-toggle ${state.catSelectMode?'on':''}" id="catSelectModeToggle">${state.catSelectMode ? '完了' : '編集'}</button>
+          ${state.catSelectMode ? `<button class="cat-delete-selected-btn" id="catDeleteSelectedBtn" ${state.catSelectedIds.length===0?'disabled':''}>${state.catSelectedIds.length}件を削除</button>` : ''}
+        </div>
+        ${state.catDeleteConfirm ? `
+          <div class="cat-delete-confirm">
+            <p>選択した${state.catSelectedIds.length}件のジャンルを削除しますか？<br>関連する記録・固定費は「その他」に振り替わります。</p>
+            <div class="row">
+              <button class="btn-confirm" id="catDeleteConfirmBtn">削除する</button>
+              <button class="btn-cancel" id="catDeleteCancelBtn">キャンセル</button>
+            </div>
+          </div>
+        ` : ""}
+      </div>
+      <div class="cat-list">${buildCategoryListHtml()}</div>
+    `;
+  }
+
   if(state.settingsSubTab === "stamps"){
     const stampListHtml = state.stamps.length===0
       ? `<div class="empty">まだ烙印がありません</div>`
@@ -2721,7 +2822,7 @@ function renderSettings(){
         <button data-newcattype="income" class="${state.newCatType==='income'?'active':''}">収入</button>
       </div>
       <div class="row">
-        <input type="text" class="icon-input" id="newCatIcon" maxlength="2" value="${state.newCatIcon}" />
+        <input type="text" class="icon-input" id="newCatIcon" maxlength="2" placeholder="絵文字" value="${state.newCatIcon}" />
         <input type="text" class="name-input" id="newCatName" placeholder="カテゴリ名" value="${state.newCatName}" />
       </div>
       <div class="swatches">
@@ -2947,16 +3048,23 @@ function attachHandlers(){
     });
 
     document.querySelectorAll("[data-stampview]").forEach(b=>{
-      b.onclick = ()=>{ state.stampReportView = b.dataset.stampview; state.expandedStampId = null; render(); };
+      b.onclick = ()=>{ state.stampReportView = b.dataset.stampview; render(); };
     });
 
-    document.querySelectorAll("[data-stamp-expand]").forEach(row=>{
+    document.querySelectorAll("[data-stamp-filter]").forEach(row=>{
       row.onclick = ()=>{
-        const id = row.dataset.stampExpand;
-        state.expandedStampId = state.expandedStampId === id ? null : id;
+        state.reportStampFilter = row.dataset.stampFilter;
         render();
       };
     });
+
+    const stampFilterBackBtn = document.getElementById("stampFilterBackBtn");
+    if(stampFilterBackBtn){
+      stampFilterBackBtn.onclick = ()=>{
+        state.reportStampFilter = null;
+        render();
+      };
+    }
 
     const track = document.getElementById("catSwipeTrack");
     if(track){
@@ -3157,11 +3265,7 @@ function attachHandlers(){
         state.catSelectedIds = [];
         state.catDeleteConfirm = false;
         state.accountDeleteConfirm = false;
-        if(b.dataset.sub === "category"){
-          state.catManageOpen = true;
-        } else {
-          state.settingsSubTab = b.dataset.sub;
-        }
+        state.settingsSubTab = b.dataset.sub;
         render();
       };
     });
@@ -3778,15 +3882,16 @@ function attachHandlers(){
     catManageBackdrop.onclick = ()=>{ if(state.catManageOpen){ state.catManageOpen = false; render(); } };
   }
   const catNewBtn = document.getElementById("catNewBtn");
-  if(catNewBtn){
-    catNewBtn.onclick = ()=>{
-      const usedColors = state.categories.map(c=>c.color);
-      const firstFree = COLOR_PRESETS.find(col=>!usedColors.includes(col));
-      state.newCatColor = firstFree || COLOR_PRESETS[0];
-      state.catAddOpen = true;
-      render();
-    };
-  }
+  const catNewBtn2 = document.getElementById("catNewBtn2");
+  const openCatAdd = ()=>{
+    const usedColors = state.categories.map(c=>c.color);
+    const firstFree = COLOR_PRESETS.find(col=>!usedColors.includes(col));
+    state.newCatColor = firstFree || COLOR_PRESETS[0];
+    state.catAddOpen = true;
+    render();
+  };
+  if(catNewBtn) catNewBtn.onclick = openCatAdd;
+  if(catNewBtn2) catNewBtn2.onclick = openCatAdd;
 
   document.querySelectorAll("[data-newcattype]").forEach(b=>{
     b.onclick = ()=>{ state.newCatType = b.dataset.newcattype; render(); };
