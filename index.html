@@ -585,26 +585,27 @@
 
   .yakiin-stamp{
     position:absolute;
-    padding:8px 12px;
-    background:
-      repeating-linear-gradient(95deg, rgba(0,0,0,0.08) 0px, transparent 2px, transparent 7px),
-      linear-gradient(155deg,#6b4028,#4a2818 55%,#2e1a0d);
-    border:2px solid rgba(234,223,200,0.4);
-    border-radius:5px;
-    color:#EFDFC5;
+    padding:8px 13px;
+    background:var(--paper);
+    border:2px solid var(--stamp-accent, var(--bengara));
+    border-radius:16px;
+    color:var(--ink);
     font-family:'Shippori Mincho', serif;
     font-weight:700;
     font-size:11px;
-    letter-spacing:.5px;
+    letter-spacing:.3px;
     line-height:1.35;
-    text-shadow:0 1px 0 rgba(0,0,0,0.5);
-    box-shadow:0 4px 10px rgba(0,0,0,0.4), inset 0 0 5px rgba(0,0,0,0.5);
+    box-shadow:
+      4px 4px 9px var(--neu-dark, rgba(182,166,133,0.55)),
+      -4px -4px 9px var(--neu-light, rgba(255,255,255,0.75));
     z-index:5;
-    max-width:100px;
+    max-width:96px;
     text-align:center;
   }
   .yakiin-stamp::before{
-    content:''; position:absolute; inset:3px; border:1px solid rgba(234,223,200,0.28); border-radius:3px; pointer-events:none;
+    content:'✦'; position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+    font-size:11px; color:var(--stamp-accent, var(--bengara)); background:var(--paper);
+    padding:0 4px; pointer-events:none;
   }
 
 
@@ -832,8 +833,16 @@
   .swatches{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
   .swatch-btn{
     width:22px; height:22px; border-radius:50%; border:2px solid transparent; cursor:pointer;
+    position:relative;
   }
   .swatch-btn.selected{ border-color:var(--ink); }
+  .swatch-btn.used{
+    cursor:not-allowed; opacity:0.25; filter:grayscale(0.6);
+  }
+  .swatch-btn.used::after{
+    content:'✕'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:10px; color:rgba(0,0,0,0.5);
+  }
   .dine-check{ display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--ink60); margin-bottom:12px; }
   /* ==================== 入力タブ：ソフト・ニューモーフィズム ==================== */
   .input-neu .switch{
@@ -1143,7 +1152,18 @@ const TOKENS = {
   gold:"#B4863E", bengara:"#8B3A2B", moss:"#55614B", cream:"#FBF7EE", line:"#D8CBAE"
 };
 
-const COLOR_PRESETS = ["#8B3A2B","#4A6C8C","#B4863E","#55614B","#7C6A8E","#A9713D","#6B4E3D","#3E5C6B","#9C6B30","#4F6B3E","#7A4A5C","#5A5A3C"];
+const COLOR_PRESETS = [
+  "#8B3A2B","#B4863E","#55614B","#4A6C8C","#7C6A8E","#A9713D",
+  "#6B4E3D","#3E5C6B","#9C6B30","#4F6B3E","#7A4A5C","#5A5A3C",
+  "#C25B44","#5A7D9A","#8E9B6E","#B98A5E","#6A4E7C","#4A8577",
+  "#C48B3F","#5E7A5C","#8C5A6B","#3F6B4E","#A75D3A","#5A6B8C"
+];
+const STAMP_ACCENT_COLORS = ["#8B3A2B","#B4863E","#55614B","#4A6C8C","#7C6A8E","#A9713D","#C25B44","#5A7D9A"];
+function stampAccentColor(id){
+  let hash = 0;
+  for(let i=0;i<String(id).length;i++){ hash = (hash*31 + String(id).charCodeAt(i)) >>> 0; }
+  return STAMP_ACCENT_COLORS[hash % STAMP_ACCENT_COLORS.length];
+}
 
 const DEFAULT_CATEGORIES = [
   // 支出カテゴリ
@@ -2231,7 +2251,8 @@ function renderMemory(){
           const offX = dir * (26 + group*36);
           const offY = group * 8;
           const rot = si%2===0 ? -6 : 5;
-          return `<div class="yakiin-stamp" style="left:calc(50% + ${offX}px); top:calc(56% + ${offY}px); transform:translate(-50%,-50%) rotate(${rot}deg); z-index:${6+si};">${s.name}</div>`;
+          const accent = stampAccentColor(s.id);
+          return `<div class="yakiin-stamp" style="left:calc(50% + ${offX}px); top:calc(56% + ${offY}px); transform:translate(-50%,-50%) rotate(${rot}deg); z-index:${6+si}; --stamp-accent:${accent};">${s.name}</div>`;
         }).join("");
 
         return `
@@ -2349,7 +2370,10 @@ function renderCatAddSheet(){
         <input type="text" class="name-input" id="newCatName" placeholder="カテゴリ名" value="${state.newCatName}" />
       </div>
       <div class="swatches">
-        ${COLOR_PRESETS.map(col=>`<button class="swatch-btn ${state.newCatColor===col?'selected':''}" data-swatch="${col}" style="background:${col}"></button>`).join("")}
+        ${COLOR_PRESETS.map(col=>{
+          const used = state.categories.some(c=>c.color===col) && state.newCatColor!==col;
+          return `<button class="swatch-btn ${state.newCatColor===col?'selected':''} ${used?'used':''}" data-swatch="${col}" style="background:${col}" ${used?'disabled title="使用中の色です"':''}></button>`;
+        }).join("")}
       </div>
       <label class="dine-check">
         <input type="checkbox" id="newCatDining" ${state.newCatDining?'checked':''} />
@@ -3697,7 +3721,13 @@ function attachHandlers(){
   }
   const catNewBtn = document.getElementById("catNewBtn");
   if(catNewBtn){
-    catNewBtn.onclick = ()=>{ state.catAddOpen = true; render(); };
+    catNewBtn.onclick = ()=>{
+      const usedColors = state.categories.map(c=>c.color);
+      const firstFree = COLOR_PRESETS.find(col=>!usedColors.includes(col));
+      state.newCatColor = firstFree || COLOR_PRESETS[0];
+      state.catAddOpen = true;
+      render();
+    };
   }
 
   document.querySelectorAll("[data-newcattype]").forEach(b=>{
@@ -3712,7 +3742,11 @@ function attachHandlers(){
   if(newCatDining) newCatDining.onchange = (e)=>{ state.newCatDining = e.target.checked; };
 
   document.querySelectorAll("[data-swatch]").forEach(b=>{
-    b.onclick = ()=>{ state.newCatColor = b.dataset.swatch; render(); };
+    b.onclick = ()=>{
+      if(b.disabled) return;
+      state.newCatColor = b.dataset.swatch;
+      render();
+    };
   });
 
   const catAddSubmitBtn = document.getElementById("catAddSubmitBtn");
