@@ -487,20 +487,25 @@
   }
   .pill.active{ border-color:var(--ink); background:var(--ink); color:var(--cream); }
   .memories{ display:flex; flex-direction:column; gap:18px; padding:0 16px 16px; }
+  .tape-wrap{
+    position:relative; padding:5px; border-radius:8px;
+    background:repeating-linear-gradient(
+      45deg,
+      var(--catcolor) 0px, var(--catcolor) 6px,
+      var(--paper) 6px, var(--paper) 12px
+    );
+    box-shadow:0 4px 10px rgba(27,42,56,0.15);
+    margin-bottom:16px;
+  }
   .memory-card{
     background:var(--cream); border-radius:4px; padding:16px; padding-bottom:18px;
-    box-shadow:0 4px 10px rgba(27,42,56,0.12); border:1px solid var(--line);
     cursor:pointer; overflow:hidden;
   }
-  .memory-card.editing{ cursor:default; box-shadow:0 4px 14px rgba(27,42,56,0.2); border-color:var(--ink); }
-  .memory-card .accent-line{
-    position:absolute; left:0; width:100%; height:2px; top:28px;
-    background:var(--cat-accent, var(--line)); opacity:0.85;
-  }
+  .memory-card.editing{ cursor:default; }
   .memory-card .top{ position:relative; z-index:2; display:flex; align-items:center; gap:8px; margin-bottom:12px; height:24px; }
   .memory-card .badge{ font-size:11px; color:white; padding:5px 12px; border-radius:999px; font-weight:700; }
-  .memory-card .date{ font-size:10.5px; font-weight:700; color:var(--ink); background:rgba(251,247,238,0.92); padding:2px 7px; border-radius:999px; }
-  .memory-card .amt{ margin-left:auto; font-size:14px; font-weight:700; background:rgba(251,247,238,0.92); padding:2px 9px; border-radius:999px; }
+  .memory-card .date{ font-size:10.5px; font-weight:700; color:var(--ink60); }
+  .memory-card .amt{ margin-left:auto; font-size:14px; font-weight:700; }
   .memory-card img{ width:100%; height:180px; object-fit:cover; border-radius:8px; margin-bottom:8px; position:relative; z-index:2; }
   .memory-card .cmt{ position:relative; z-index:2; font-family:var(--font-serif); font-size:13px; color:var(--ink); line-height:1.7; }
   .memory-card .cmt.cmt-empty{ color:var(--ink40); }
@@ -1091,11 +1096,10 @@
     box-shadow: inset 2px 2px 5px var(--neu-dark), inset -2px -2px 5px var(--neu-light);
   }
   .memory-neu .memory-card{
-    background:var(--paper); border:1px solid var(--line);
-    box-shadow: 8px 8px 16px var(--neu-dark), -8px -8px 16px var(--neu-light);
+    background:var(--paper); border:none;
   }
-  .memory-neu .memory-card .date, .memory-neu .memory-card .amt{
-    background:rgba(242,233,218,0.92);
+  .memory-neu .tape-wrap{
+    box-shadow: 6px 6px 14px var(--neu-dark), -6px -6px 14px var(--neu-light);
   }
   .memory-neu .memory-card.editing{
     box-shadow: inset 4px 4px 8px var(--neu-dark), inset -4px -4px 8px var(--neu-light);
@@ -2254,16 +2258,17 @@ function buildSimpleMemoryCards(txList){
       return `<div class="yakiin-stamp" style="left:calc(50% + ${offX}px); top:calc(56% + ${offY}px); transform:translate(-50%,-50%) rotate(${rot}deg); z-index:${6+si}; --stamp-accent:${accent}; --stamp-accent-light:${accentLight};">${s.name}</div>`;
     }).join("");
     return `
-      <div class="memory-card" style="transform:rotate(${rotate}deg); --cat-accent:${c.color};" data-open-memory-report="${t.id}">
-        <div class="accent-line"></div>
-        ${stampBadgesHtml}
-        <div class="top">
-          <span class="badge" style="background:${c.color}">${c.icon} ${c.name}</span>
-          <span class="date">${t.date}</span>
-          <span class="amt" style="color:${t.type==='income'?TOKENS.moss:TOKENS.bengara}">${t.type==='income'?'+':'-'}${yen(t.amount)}</span>
+      <div class="tape-wrap" style="transform:rotate(${rotate}deg); --catcolor:${c.color};">
+        <div class="memory-card" data-open-memory-report="${t.id}">
+          ${stampBadgesHtml}
+          <div class="top">
+            <span class="badge" style="background:${c.color}">${c.icon} ${c.name}</span>
+            <span class="date">${t.date}</span>
+            <span class="amt" style="color:${t.type==='income'?TOKENS.moss:TOKENS.bengara}">${t.type==='income'?'+':'-'}${yen(t.amount)}</span>
+          </div>
+          ${t.photo ? `<img src="${t.photo}" />` : ''}
+          <div class="cmt ${t.comment?'':'cmt-empty'}">${t.comment || '例：店の名前、一言思い出。'}</div>
         </div>
-        ${t.photo ? `<img src="${t.photo}" />` : ''}
-        <div class="cmt ${t.comment?'':'cmt-empty'}">${t.comment || '例：店の名前、一言思い出。'}</div>
       </div>
     `;
   }).join("");
@@ -2406,16 +2411,17 @@ function renderMemory(){
         }).join("");
 
         return `
-          <div class="memory-card ${state.reflectionMode?'stamp-mode':''} ${hasActiveStamp?'stamped-active':''}" style="transform:rotate(${rotate}deg); --cat-accent:${c.color};" ${clickAttr}>
-            <div class="accent-line"></div>
-            ${stampBadgesHtml}
-            <div class="top">
-              <span class="badge" style="background:${c.color}">${c.icon} ${c.name}</span>
-              <span class="date">${t.date}</span>
-              <span class="amt" style="color:${t.type==='income'?TOKENS.moss:TOKENS.bengara}">${t.type==='income'?'+':'-'}${yen(t.amount)}</span>
+          <div class="tape-wrap" style="transform:rotate(${rotate}deg); --catcolor:${c.color};">
+            <div class="memory-card ${state.reflectionMode?'stamp-mode':''} ${hasActiveStamp?'stamped-active':''}" ${clickAttr}>
+              ${stampBadgesHtml}
+              <div class="top">
+                <span class="badge" style="background:${c.color}">${c.icon} ${c.name}</span>
+                <span class="date">${t.date}</span>
+                <span class="amt" style="color:${t.type==='income'?TOKENS.moss:TOKENS.bengara}">${t.type==='income'?'+':'-'}${yen(t.amount)}</span>
+              </div>
+              ${t.photo ? `<img src="${t.photo}" />` : ''}
+              <div class="cmt ${t.comment?'':'cmt-empty'}">${t.comment || '例：店の名前、一言思い出。'}</div>
             </div>
-            ${t.photo ? `<img src="${t.photo}" />` : ''}
-            <div class="cmt ${t.comment?'':'cmt-empty'}">${t.comment || '例：店の名前、一言思い出。'}</div>
           </div>
         `;
       }).join("");
