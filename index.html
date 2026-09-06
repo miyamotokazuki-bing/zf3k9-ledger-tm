@@ -442,9 +442,11 @@
   .report-title{ font-family:var(--font-serif); font-size:15px; color:var(--ink); margin:0 0 10px; padding:0 16px;}
   .stamp-period-toggle{ display:flex; gap:4px; flex:0 0 auto; }
   .section-swap-btn{
-    background:none; border:none; padding:0; font-size:14px; cursor:pointer;
-    vertical-align:middle; line-height:1;
+    background:none; border:none; padding:0; cursor:pointer;
+    vertical-align:middle; line-height:1; width:18px; height:18px;
+    display:inline-flex; align-items:center; justify-content:center;
   }
+  .section-swap-btn svg{ width:16px; height:16px; }
   .stamp-period-toggle button{
     padding:5px 10px; border-radius:999px; border:1px solid var(--line); background:var(--cream);
     color:var(--ink60); font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap;
@@ -1134,6 +1136,7 @@
   }
   .memory-neu .memory-card{
     background:var(--paper); border:none;
+    box-shadow: 6px 6px 14px var(--neu-dark), -6px -6px 14px var(--neu-light);
   }
   .memory-neu .tape-wrap{
     box-shadow: 6px 6px 14px var(--neu-dark), -6px -6px 14px var(--neu-light);
@@ -1342,6 +1345,8 @@
 </div>
 
 <script>
+const SWAP_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 3.5v14M7 3.5L3 7.5M7 3.5l4 4" stroke="#8B3A2B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 20.5v-14M17 20.5l-4-4M17 20.5l4-4" stroke="#8B3A2B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
 const TOKENS = {
   ink:"#1B2A38", paper:"#F2E9DA", paperDeep:"#E7DCC6",
   gold:"#B4863E", bengara:"#8B3A2B", moss:"#55614B", cream:"#FBF7EE", line:"#D8CBAE"
@@ -2365,7 +2370,7 @@ function renderReport(){
 
       const budgetSectionHtml = `
         <div class="report-title" id="budgetSectionTitle" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-          <span>${!state.reportSectionSwapped ? '<button class=\"section-swap-btn\" id=\"reportSwapBtn\">🔁</button> ' : ''}今月の予算の消化状況</span>
+          <span>${!state.reportSectionSwapped ? `<button class="section-swap-btn" id="reportSwapBtn">${SWAP_ICON_SVG}</button> ` : ''}今月の予算の消化状況</span>
         </div>
         ${budgetCats.length===0 ? `<div class="empty">設定タブから予算を登録できます</div>` : `
           <div class="budget-section">
@@ -2380,7 +2385,7 @@ function renderReport(){
 
       const stampSectionHtml = `
         <div class="report-title" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-          <span>${state.reportSectionSwapped ? '<button class=\"section-swap-btn\" id=\"reportSwapBtn\">🔁</button> ' : ''}振り返りスタンプ（${state.stampReportView==='year' ? year+'年' : year+'年'+(month+1)+'月'}）</span>
+          <span>${state.reportSectionSwapped ? `<button class="section-swap-btn" id="reportSwapBtn">${SWAP_ICON_SVG}</button> ` : ''}振り返りスタンプ（${state.stampReportView==='year' ? year+'年' : year+'年'+(month+1)+'月'}）</span>
           <div class="stamp-period-toggle">
             <button data-stampview="month" class="${state.stampReportView!=='year'?'active':''}">月間</button>
             <button data-stampview="year" class="${state.stampReportView==='year'?'active':''}">年間</button>
