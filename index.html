@@ -1136,7 +1136,14 @@
   }
   .memory-neu .memory-card{
     background:var(--paper); border:none;
+  }
+  .memory-neu .memory-card.card-default-neu{
     box-shadow: 6px 6px 14px var(--neu-dark), -6px -6px 14px var(--neu-light);
+  }
+  .frame-vine, .frame-elegant, .frame-china2, .frame-book,
+  .frame-ribbon, .frame-wafu, .frame-gakubuchi{
+    box-shadow: 0 10px 26px rgba(27,42,56,0.22);
+    border-radius:6px;
   }
   .memory-neu .tape-wrap{
     box-shadow: 6px 6px 14px var(--neu-dark), -6px -6px 14px var(--neu-light);
@@ -1402,7 +1409,7 @@ function wrapCardFrame(innerHtml, color, rotateDeg){
   const style = FRAME_OPTIONS[state.selectedFrame] ? state.selectedFrame : "default";
   const rotStyle = `transform:rotate(${rotateDeg}deg);`;
   if(style === "default"){
-    return innerHtml.replace('<div class="memory-card', `<div style="${rotStyle}" class="memory-card`);
+    return innerHtml.replace('<div class="memory-card', `<div style="${rotStyle}" class="memory-card card-default-neu`);
   }
   const opt = FRAME_OPTIONS[style];
   const deg = hueRotateForColor(color, opt.baseHue);
