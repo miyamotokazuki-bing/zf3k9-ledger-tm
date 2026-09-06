@@ -59,6 +59,13 @@
     box-shadow:0 20px 50px rgba(0,0,0,0.35);
     position:relative;
   }
+  html.native-app body{
+    padding:0; background:var(--paper); align-items:stretch; justify-content:stretch;
+  }
+  html.native-app .phone{
+    width:100%; max-width:100%; height:100%; height:100dvh;
+    border:none; border-radius:0; box-shadow:none;
+  }
   .header{
     background:var(--ink);
     padding:16px 18px 14px;
@@ -549,27 +556,34 @@
   .edit-actions .btn-cancel{ background:var(--paperDeep); color:var(--ink60); }
   .empty{ color:var(--ink40); font-size:12px; text-align:center; padding:30px 0; }
 
-  /* ---- 認証画面 ---- */
-  .auth-screen{
-    height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    padding:40px 32px; text-align:center;
+  /* ---- 初回説明画面 ---- */
+  .intro-screen{
+    height:100%; display:flex; flex-direction:column;
+    padding:36px 26px 24px; overflow-y:auto;
   }
-  .auth-screen .auth-logo{
-    font-family:var(--font-serif); font-size:24px; font-weight:700; color:var(--ink); margin-bottom:8px;
+  .intro-logo{
+    font-family:var(--font-serif); font-size:22px; font-weight:700; color:var(--ink);
+    text-align:center; margin-bottom:24px; flex:0 0 auto;
   }
-  .auth-screen .auth-sub{ font-size:12px; color:var(--ink60); margin-bottom:40px; }
+  .intro-body{ flex:1 1 auto; overflow-y:auto; }
+  .intro-section-title{
+    font-family:var(--font-serif); font-size:14.5px; font-weight:700; color:var(--bengara);
+    margin:20px 0 10px;
+  }
+  .intro-section-title:first-child{ margin-top:0; }
+  .intro-text{
+    font-size:13px; color:var(--ink); line-height:1.85; margin:0 0 12px;
+  }
+  .intro-tips{ margin:0; padding-left:20px; }
+  .intro-tips li{ font-size:13px; color:var(--ink); line-height:1.85; margin-bottom:8px; }
+  .intro-start-btn{
+    width:100%; padding:15px 0; border-radius:12px; border:none; background:var(--ink);
+    color:var(--cream); font-size:15px; font-weight:700; cursor:pointer; margin-top:20px; flex:0 0 auto;
+  }
   .auth-google-btn{
     display:flex; align-items:center; justify-content:center; gap:10px;
     width:100%; padding:14px 0; border-radius:12px; border:1.5px solid var(--line);
     background:white; color:var(--ink); font-size:14px; font-weight:700; cursor:pointer;
-  }
-  .auth-guest-btn{
-    width:100%; padding:13px 0; border-radius:12px; border:1.5px dashed var(--line);
-    background:transparent; color:var(--ink60); font-size:13px; font-weight:600; cursor:pointer;
-    margin-top:14px;
-  }
-  .auth-guest-note{
-    font-size:10.5px; color:var(--ink40); line-height:1.6; margin-top:12px; padding:0 8px;
   }
   .auth-loading{
     height:100%; display:flex; align-items:center; justify-content:center;
@@ -735,10 +749,10 @@
     display:flex; align-items:center; gap:10px; padding:11px 16px; border-bottom:1px solid var(--line); cursor:pointer;
   }
   .stamp-report-row .icon{ font-size:16px; }
-  .stamp-report-row .nm{ flex:1; font-size:13.5px; font-weight:600; color:var(--ink); }
-  .stamp-report-row .cnt{ font-size:13px; font-weight:700; color:var(--ink60); }
-  .stamp-report-row .cnt-amt{ display:flex; align-items:center; gap:8px; }
-  .stamp-report-row .amt-total{ font-size:13px; font-weight:700; color:var(--ink60); }
+  .stamp-report-row .nm{ flex:1; font-size:14.5px; font-weight:600; color:var(--ink); }
+  .stamp-report-row .cnt{ font-size:15px; font-weight:700; color:var(--ink60); }
+  .stamp-report-row .cnt-amt{ display:flex; align-items:center; gap:10px; }
+  .stamp-report-row .amt-total{ font-size:15.5px; font-weight:700; color:var(--ink60); }
   .stamp-report-row .chev{ color:var(--ink40); font-size:11px; transition:transform .2s; }
   .stamp-report-row .chev.open{ transform:rotate(90deg); }
   .stamp-detail-item{
@@ -1325,6 +1339,13 @@
   const fbAuth = firebase.auth();
   const fbDb = firebase.firestore();
 </script>
+<script>
+  (function(){
+    if(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()){
+      document.documentElement.classList.add('native-app');
+    }
+  })();
+</script>
 <body>
 
 <svg width="0" height="0" style="position:absolute;">
@@ -1475,6 +1496,7 @@ let state = {
   authUser: null,
   authReady: false,
   guestMode: false,
+  introSeen: false,
   accountDeleteConfirm: false,
   csvIncludeDining: true,
   csvIncludeComment: true,
@@ -1566,13 +1588,13 @@ let state = {
   fixedCosts: [],
 
   transactions: [
-    { id:"t1", date:"2026-08-02", type:"expense", categoryId:"travel", amount:3200,
+    { id:"t1", date:`${TODAY_Y}-${String(TODAY_M).padStart(2,'0')}-02`, type:"expense", categoryId:"travel", amount:3200,
       comment:"江ノ島シーキャンドル（展望灯台）の入場料。頂上からの景色に感動した。",
       photo:"https://images.unsplash.com/photo-1580274455191-1c62238fa333?w=600&q=60", diningOut:null, stamps:[], isExample:true },
-    { id:"t5", date:"2026-08-07", type:"expense", categoryId:"transport", amount:420,
+    { id:"t5", date:`${TODAY_Y}-${String(TODAY_M).padStart(2,'0')}-07`, type:"expense", categoryId:"transport", amount:420,
       comment:"ちなみに、ここに出ている例の買い物はレポート欄の会計には入らないようになっています。",
       photo:null, diningOut:null, stamps:[], isExample:true },
-    { id:"t6", date:"2026-08-07", type:"expense", categoryId:"food", amount:2200, comment:"同僚とランチ。", photo:null, diningOut:true, stamps:[], isExample:true },
+    { id:"t6", date:`${TODAY_Y}-${String(TODAY_M).padStart(2,'0')}-07`, type:"expense", categoryId:"food", amount:2200, comment:"同僚とランチ。", photo:null, diningOut:true, stamps:[], isExample:true },
   ]
 };
 
@@ -1735,6 +1757,7 @@ function getPersistData(){
     selectedFont: state.selectedFont,
     selectedFrame: state.selectedFrame,
     reportSectionSwapped: state.reportSectionSwapped,
+    introSeen: state.introSeen,
   };
 }
 
@@ -1779,17 +1802,25 @@ function renderAuthLoading(){
   return `<div class="auth-loading">読み込み中…</div>`;
 }
 
-function renderAuthScreen(){
+function renderIntroScreen(){
   return `
-    <div class="auth-screen">
-      <div class="auth-logo">思い出家計簿</div>
-      <div class="auth-sub">ログインすると、記録を他の端末とも共有できます</div>
-      <button class="auth-google-btn" id="googleSignInBtn">
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.1-7.9 19.1-19.6 0-1.3-.1-2.6-.3-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 16 4 9.1 8.6 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.4 0 10.2-1.9 13.9-5.1l-6.4-5.4C29.6 35.4 26.9 36.4 24 36.4c-5.3 0-9.7-3.4-11.3-8.1l-6.6 5.1C9 39.3 15.9 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.4 5.4C40.4 36.5 44 30.9 44 24c0-1.3-.1-2.6-.4-3.5z"/></svg>
-        <span>Googleでログイン</span>
-      </button>
-      <button class="auth-guest-btn" id="guestModeBtn">ログインなしで始める</button>
-      <div class="auth-guest-note">この端末だけにデータを保存します。あとからログインしてクラウド同期に切り替えられます。</div>
+    <div class="intro-screen">
+      <div class="intro-logo">思い出家計簿</div>
+      <div class="intro-body">
+        <div class="intro-section-title">作者からのコメント</div>
+        <p class="intro-text">
+          支払いは思い出タイムラインに残るので、写真や購入品の説明を残すとより楽しいです。
+        </p>
+        <p class="intro-text">
+          「要らなかったもの」などと名付けた烙印を、振り返りのスクロールがてら押してみてください。烙印カテゴリごとにレポートタブで件数と合計金額を確認できるので、自分のお金の使い道を簡単に見直せたりします。（もちろんつくる烙印によって、反省だけでなく楽しい思い出も振り返れます）
+        </p>
+        <div class="intro-section-title">Tips</div>
+        <ul class="intro-tips">
+          <li>「０円」のところをタッチしても電卓が開けます。</li>
+          <li>設定→表示からフォントやカードフレームをカスタマイズできます。</li>
+        </ul>
+      </div>
+      <button class="intro-start-btn" id="introStartBtn">はじめる</button>
     </div>
   `;
 }
@@ -1817,28 +1848,23 @@ function render(){
     c.innerHTML = renderAuthLoading();
     return;
   }
-  if(!state.authUser && !state.guestMode){
+  if(!state.introSeen){
     navEl.innerHTML = "";
-    c.innerHTML = renderAuthScreen();
-    const googleBtn = document.getElementById("googleSignInBtn");
-    if(googleBtn){
-      googleBtn.onclick = ()=>{
-        const provider = new firebase.auth.GoogleAuthProvider();
-        fbAuth.signInWithPopup(provider).catch(e=>{
-          console.warn("ログインに失敗しました", e);
-          alert("ログインに失敗しました。もう一度お試しください。");
-        });
-      };
-    }
-    const guestBtn = document.getElementById("guestModeBtn");
-    if(guestBtn){
-      guestBtn.onclick = ()=>{
+    c.innerHTML = renderIntroScreen();
+    const startBtn = document.getElementById("introStartBtn");
+    if(startBtn){
+      startBtn.onclick = ()=>{
+        state.introSeen = true;
         state.guestMode = true;
         saveGuestMode(true);
         render();
       };
     }
     return;
+  }
+  if(!state.authUser && !state.guestMode){
+    state.guestMode = true;
+    saveGuestMode(true);
   }
 
   saveState();
@@ -2018,14 +2044,7 @@ function renderInput(){
       </div>
     </div>
 
-    <input type="file" accept="image/*" capture="environment" id="receiptInput" style="display:none" />
     <div class="amount-row">
-      <button class="receipt-icon-btn ${state.receiptLoading?'loading':''}" id="receiptBtn" title="レシートを読み込む" ${state.receiptLoading?'disabled':''}>
-        ${state.receiptLoading
-          ? `<span class="spin"></span><span>読み取り中</span>`
-          : `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3.5"/></svg><span>レシート読込</span>`
-        }
-      </button>
       <div class="amount-box" id="amountBoxTap" style="cursor:pointer;">
         <span class="num ${state.inputAmount?'':'empty'}">${state.inputAmount ? Number(state.inputAmount).toLocaleString('ja-JP') : '0'}</span>
         <span class="yen">円</span>
