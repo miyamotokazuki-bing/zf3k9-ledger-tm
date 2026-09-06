@@ -441,6 +441,10 @@
 
   .report-title{ font-family:var(--font-serif); font-size:15px; color:var(--ink); margin:0 0 10px; padding:0 16px;}
   .stamp-period-toggle{ display:flex; gap:4px; flex:0 0 auto; }
+  .section-swap-btn{
+    background:none; border:none; padding:0; font-size:14px; cursor:pointer;
+    vertical-align:middle; line-height:1;
+  }
   .stamp-period-toggle button{
     padding:5px 10px; border-radius:999px; border:1px solid var(--line); background:var(--cream);
     color:var(--ink60); font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap;
@@ -1509,6 +1513,7 @@ let state = {
   settingsSubTab: "budget",
   budgets: { food: 30000, cafe: 5000, hobby: 8000 },
   excludeUnbudgeted: false,
+  reportSectionSwapped: false,
   showDiningStat: true,
   showBentoOption: true,
   selectedFont: "default",
@@ -2342,6 +2347,36 @@ function renderReport(){
     `;
   }).join("");
 
+      const budgetSectionHtml = `
+        <div class="report-title" id="budgetSectionTitle" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+          <span>${!state.reportSectionSwapped ? '<button class=\"section-swap-btn\" id=\"reportSwapBtn\">🔁</button> ' : ''}今月の予算の消化状況</span>
+        </div>
+        ${budgetCats.length===0 ? `<div class="empty">設定タブから予算を登録できます</div>` : `
+          <div class="budget-section">
+            ${budgetRowsHtml}
+            <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--line); font-size:11.5px; color:var(--ink60); display:flex; justify-content:space-between;">
+              <span>予算合計 ${yen(totalBudget)}</span>
+              <span>${state.excludeUnbudgeted ? '予算外の支出 ' + yen(unbudgetedSpent) + '（合計に含めない）' : ''}</span>
+            </div>
+          </div>
+        `}
+      `;
+
+      const stampSectionHtml = `
+        <div class="report-title" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+          <span>${state.reportSectionSwapped ? '<button class=\"section-swap-btn\" id=\"reportSwapBtn\">🔁</button> ' : ''}振り返りスタンプ（${state.stampReportView==='year' ? year+'年' : year+'年'+(month+1)+'月'}）</span>
+          <div class="stamp-period-toggle">
+            <button data-stampview="month" class="${state.stampReportView!=='year'?'active':''}">月間</button>
+            <button data-stampview="year" class="${state.stampReportView==='year'?'active':''}">年間</button>
+          </div>
+        </div>
+        ${state.stamps.length===0 ? `<div class="empty">思い出タブの「烙印モード」、または設定タブから烙印を追加できます</div>` : `
+          <div style="border-top:1px solid var(--line); margin-bottom:8px;">
+            ${stampRowsHtml}
+          </div>
+        `}
+      `;
+
   return `
     <div class="pad report-neu" style="padding-left:0;padding-right:0;">
       <div style="padding:0 16px;">
@@ -2419,29 +2454,7 @@ function renderReport(){
         </div>
       ` : ''}
 
-      <div class="report-title">今月の予算の消化状況</div>
-      ${budgetCats.length===0 ? `<div class="empty">設定タブから予算を登録できます</div>` : `
-        <div class="budget-section">
-          ${budgetRowsHtml}
-          <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--line); font-size:11.5px; color:var(--ink60); display:flex; justify-content:space-between;">
-            <span>予算合計 ${yen(totalBudget)}</span>
-            <span>${state.excludeUnbudgeted ? '予算外の支出 ' + yen(unbudgetedSpent) + '（合計に含めない）' : ''}</span>
-          </div>
-        </div>
-      `}
-
-      <div class="report-title" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-        <span>振り返りスタンプ（${state.stampReportView==='year' ? year+'年' : year+'年'+(month+1)+'月'}）</span>
-        <div class="stamp-period-toggle">
-          <button data-stampview="month" class="${state.stampReportView!=='year'?'active':''}">月間</button>
-          <button data-stampview="year" class="${state.stampReportView==='year'?'active':''}">年間</button>
-        </div>
-      </div>
-      ${state.stamps.length===0 ? `<div class="empty">思い出タブの「烙印モード」、または設定タブから烙印を追加できます</div>` : `
-        <div style="border-top:1px solid var(--line); margin-bottom:8px;">
-          ${stampRowsHtml}
-        </div>
-      `}
+      ${state.reportSectionSwapped ? stampSectionHtml + budgetSectionHtml : budgetSectionHtml + stampSectionHtml}
     </div>
   `;
 }
@@ -3329,6 +3342,15 @@ function attachHandlers(){
     document.querySelectorAll("[data-stampview]").forEach(b=>{
       b.onclick = ()=>{ state.stampReportView = b.dataset.stampview; render(); };
     });
+
+    const reportSwapBtn = document.getElementById("reportSwapBtn");
+    if(reportSwapBtn){
+      reportSwapBtn.onclick = (e)=>{
+        e.stopPropagation();
+        state.reportSectionSwapped = !state.reportSectionSwapped;
+        render();
+      };
+    }
 
     document.querySelectorAll("[data-stamp-filter]").forEach(row=>{
       row.onclick = ()=>{
