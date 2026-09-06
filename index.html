@@ -452,12 +452,13 @@
   }
   .report-title.collapsible .chev{ font-size:11px; color:var(--ink40); transition:transform .2s; }
   .report-title.collapsible .chev.open{ transform:rotate(90deg); }
-  .pie-wrap{ display:flex; justify-content:center; margin-bottom:10px; }
-  .legend{ display:flex; flex-direction:column; gap:6px; padding:0 16px; margin-bottom:20px; }
-  .legend-row{ display:flex; align-items:center; gap:8px; }
-  .legend-row .dot{ width:8px; height:8px; border-radius:50%; }
-  .legend-row .name{ flex:1; font-size:12.5px; color:var(--ink); }
-  .legend-row .val{ font-size:12.5px; color:var(--ink60); }
+  .pie-wrap{ display:flex; justify-content:center; margin-bottom:14px; }
+  .legend{ display:flex; flex-direction:column; gap:10px; padding:0 16px; margin-bottom:20px; }
+  .legend-row{ display:flex; align-items:center; gap:10px; }
+  .legend-row .dot{ width:11px; height:11px; border-radius:50%; flex:0 0 auto; }
+  .legend-row .name{ flex:1; font-size:15px; font-weight:600; color:var(--ink); }
+  .legend-row .pct{ font-size:14px; font-weight:700; color:var(--bengara); min-width:38px; text-align:right; }
+  .legend-row .val{ font-size:14.5px; font-weight:600; color:var(--ink60); min-width:76px; text-align:right; }
 
   .cat-swipe-wrap{ overflow:hidden; }
   .cat-swipe-track{ display:flex; width:200%; transition:transform .3s ease; touch-action:pan-y; }
@@ -588,8 +589,8 @@
   .stamp-screen-frame.show{ display:block; }
   .stamp-complete-btn{
     position:absolute; top:14px; right:14px; z-index:30;
-    padding:8px 16px; border-radius:999px; border:none;
-    background:var(--bengara); color:white; font-size:12.5px; font-weight:700; cursor:pointer;
+    padding:12px 24px; border-radius:999px; border:none;
+    background:var(--bengara); color:white; font-size:15px; font-weight:700; cursor:pointer;
     box-shadow:0 3px 10px rgba(0,0,0,0.3);
     display:none;
   }
@@ -1467,6 +1468,7 @@ let state = {
   stampReportView: "month",
   stampQuickAddOpen: false,
   newStampIcon: "🏷️",
+  stampAddOpen: false,
   newStampName: "",
   newStampColor: COLOR_PRESETS[0],
 
@@ -2191,21 +2193,67 @@ function renderReport(){
     if(data.length===0) return "";
     const total = data.reduce((s,d)=>s+d.value,0);
     let angle = -90;
-    const R=75, r=45, cx=100, cy=100;
+    const R=82, r=48, cx=140, cy=140;
+    const toRad = a => (a*Math.PI)/180;
+    const labelEls = [];
+    const outsideLabels = [];
     const arcs = data.map(d=>{
+      const pct = (d.value/total)*100;
+      const pctLabel = (pct>=10 ? Math.round(pct) : Math.round(pct*10)/10) + "%";
       const sweep = (d.value/total)*360;
       const startAngle = angle;
       const endAngle = angle + sweep;
+      const midAngle = (startAngle+endAngle)/2;
       angle = endAngle;
-      const toRad = a => (a*Math.PI)/180;
       const x1 = cx + R*Math.cos(toRad(startAngle)), y1 = cy + R*Math.sin(toRad(startAngle));
       const x2 = cx + R*Math.cos(toRad(endAngle)), y2 = cy + R*Math.sin(toRad(endAngle));
       const ix1 = cx + r*Math.cos(toRad(endAngle)), iy1 = cy + r*Math.sin(toRad(endAngle));
       const ix2 = cx + r*Math.cos(toRad(startAngle)), iy2 = cy + r*Math.sin(toRad(startAngle));
       const largeArc = sweep>180?1:0;
-      return `<path d="M ${x1} ${y1} A ${R} ${R} 0 ${largeArc} 1 ${x2} ${y2} L ${ix1} ${iy1} A ${r} ${r} 0 ${largeArc} 0 ${ix2} ${iy2} Z" fill="${d.color}" stroke="${TOKENS.paper}" stroke-width="2"/>`;
+      const path = `<path d="M ${x1} ${y1} A ${R} ${R} 0 ${largeArc} 1 ${x2} ${y2} L ${ix1} ${iy1} A ${r} ${r} 0 ${largeArc} 0 ${ix2} ${iy2} Z" fill="${d.color}" stroke="${TOKENS.paper}" stroke-width="2"/>`;
+
+      if(sweep >= 24){
+        // 十分な幅があるスライスは内側にカテゴリ名＋%を表示
+        const midR = (R+r)/2;
+        const lx = cx + midR*Math.cos(toRad(midAngle));
+        const ly = cy + midR*Math.sin(toRad(midAngle));
+        labelEls.push(`
+          <text x="${lx}" y="${ly-6}" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" paint-order="stroke" stroke="rgba(0,0,0,0.4)" stroke-width="3">${d.name}</text>
+          <text x="${lx}" y="${ly+8}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff" paint-order="stroke" stroke="rgba(0,0,0,0.4)" stroke-width="3">${pctLabel}</text>
+        `);
+      } else {
+        // 狭いスライスは引き出し線で外にラベルを出す（後で重なりを調整）
+        const edgeX = cx + R*Math.cos(toRad(midAngle));
+        const edgeY = cy + R*Math.sin(toRad(midAngle));
+        const elbowR = R+16;
+        const elbowX = cx + elbowR*Math.cos(toRad(midAngle));
+        const elbowY = cy + elbowR*Math.sin(toRad(midAngle));
+        const dir = Math.cos(toRad(midAngle)) >= 0 ? 1 : -1;
+        outsideLabels.push({ edgeX, edgeY, elbowX, elbowY, dir, name:d.name, pctLabel, color:d.color });
+      }
+      return path;
     }).join("");
-    return `<svg width="200" height="200" viewBox="0 0 200 200">${arcs}</svg>`;
+
+    // 引き出しラベル同士が重ならないよう、同じ側(左/右)ごとにY座標を調整
+    const minGap = 26;
+    ["left","right"].forEach(side=>{
+      const group = outsideLabels.filter(l => (side==="right" ? l.dir>0 : l.dir<0)).sort((a,b)=>a.elbowY-b.elbowY);
+      for(let i=1;i<group.length;i++){
+        if(group[i].elbowY - group[i-1].elbowY < minGap){
+          group[i].elbowY = group[i-1].elbowY + minGap;
+        }
+      }
+    });
+    outsideLabels.forEach(l=>{
+      const textX = l.elbowX + l.dir*14;
+      const anchor = l.dir>0 ? "start" : "end";
+      labelEls.push(`
+        <polyline points="${l.edgeX},${l.edgeY} ${l.elbowX},${l.elbowY} ${textX},${l.elbowY}" fill="none" stroke="${l.color}" stroke-width="1.5"/>
+        <text x="${textX + (l.dir>0?3:-3)}" y="${l.elbowY-2}" text-anchor="${anchor}" font-size="9.5" font-weight="700" fill="${TOKENS.ink}">${l.name}</text>
+        <text x="${textX + (l.dir>0?3:-3)}" y="${l.elbowY+10}" text-anchor="${anchor}" font-size="9.5" font-weight="700" fill="rgba(27,42,56,0.6)">${l.pctLabel}</text>
+      `);
+    });
+    return `<svg width="280" height="280" viewBox="0 0 280 280">${arcs}${labelEls.join("")}</svg>`;
   }
   const pieSvg = buildPieSvg(byCat);
   const pieSvgIncome = buildPieSvg(byCatIncome);
@@ -2223,12 +2271,13 @@ function renderReport(){
     const budget = state.budgets[cid];
     const spent = monthTx.filter(t=>t.type==="expense" && t.categoryId===cid).reduce((s,t)=>s+t.amount,0);
     const pct = Math.min((spent/budget)*100, 100);
+    const pctDisplay = Math.round((spent/budget)*100);
     const over = spent > budget;
     return `
       <div class="budget-row">
         <div class="top">
           <span class="cat">${c.icon} ${c.name}</span>
-          <span style="color:${over?TOKENS.bengara:'var(--ink60)'}">${yen(spent)} / ${yen(budget)}</span>
+          <span style="color:${over?TOKENS.bengara:'var(--ink60)'}">${yen(spent)} / ${yen(budget)}　<b>${pctDisplay}%</b></span>
         </div>
         <div class="budget-bar-bg">
           <div class="budget-bar-fill" style="width:${pct}%; background:${over?TOKENS.bengara:c.color}"></div>
@@ -2300,13 +2349,14 @@ function renderReport(){
               ${byCat.length===0 ? `<div class="empty">データなし</div>` : `
                 <div class="pie-wrap">${pieSvg}</div>
                 <div class="legend">
-                  ${byCat.map(d=>`
+                  ${(() => { const totalExp = byCat.reduce((s,d)=>s+d.value,0); return byCat.map(d=>`
                     <div class="legend-row">
                       <span class="dot" style="background:${d.color}"></span>
                       <span class="name">${d.name}</span>
+                      <span class="pct">${Math.round((d.value/totalExp)*100)}%</span>
                       <span class="val">${yen(d.value)}</span>
                     </div>
-                  `).join("")}
+                  `).join(""); })()}
                 </div>
               `}
             </div>
@@ -2315,13 +2365,14 @@ function renderReport(){
               ${byCatIncome.length===0 ? `<div class="empty">データなし</div>` : `
                 <div class="pie-wrap">${pieSvgIncome}</div>
                 <div class="legend">
-                  ${byCatIncome.map(d=>`
+                  ${(() => { const totalInc = byCatIncome.reduce((s,d)=>s+d.value,0); return byCatIncome.map(d=>`
                     <div class="legend-row">
                       <span class="dot" style="background:${d.color}"></span>
                       <span class="name">${d.name}</span>
+                      <span class="pct">${Math.round((d.value/totalInc)*100)}%</span>
                       <span class="val">${yen(d.value)}</span>
                     </div>
-                  `).join("")}
+                  `).join(""); })()}
                 </div>
               `}
             </div>
@@ -2364,7 +2415,7 @@ function renderReport(){
 // ---------- MEMORY ----------
 function buildSimpleMemoryCards(txList){
   if(txList.length === 0) return `<div class="empty">この期間には該当する記録がありません</div>`;
-  return txList.slice().sort((a,b)=> a.date < b.date ? 1 : -1).map((t,i)=>{
+  return txList.slice().reverse().sort((a,b)=> a.date===b.date ? 0 : (a.date < b.date ? 1 : -1)).map((t,i)=>{
     const c = catOf(t.categoryId);
     const rotate = i%2===0 ? -1.2 : 1.4;
     const txStamps = (t.stamps || []).map(sid=>state.stamps.find(s=>s.id===sid)).filter(Boolean);
@@ -2434,7 +2485,8 @@ function renderMemory(){
 
   const sorted = periodMemory
     .slice()
-    .sort((a,b)=> a.date < b.date ? 1 : -1)
+    .reverse()
+    .sort((a,b)=> a.date===b.date ? 0 : (a.date < b.date ? 1 : -1))
     .filter(t=> state.memoryFilter==="all" || t.categoryId===state.memoryFilter);
 
   const monthNavHtml = navHtml;
@@ -2933,18 +2985,22 @@ function renderSettings(){
 
     return `
       ${sub}
-      <div class="cat-list">${stampListHtml}</div>
-      <div class="cat-add-form">
-        <div class="report-title" style="padding:0; margin-bottom:10px;">新しい烙印を追加</div>
-        <div class="row">
-          <input type="text" class="icon-input" id="newStampIcon" maxlength="2" value="${state.newStampIcon}" />
-          <input type="text" class="name-input" id="newStampName" placeholder="例）自分へのご褒美、プレゼント用、等々" value="${state.newStampName}" />
-        </div>
-        <div class="swatches">
-          ${COLOR_PRESETS.map(col=>`<button class="swatch-btn ${state.newStampColor===col?'selected':''}" data-stampswatch="${col}" style="background:${col}"></button>`).join("")}
-        </div>
-        <button class="add-btn" id="addStampBtn">烙印を追加</button>
+      <div style="padding:0 16px 12px;">
+        <button class="cat-new-btn" id="stampNewBtn">＋ 新規烙印を追加</button>
+        ${state.stampAddOpen ? `
+          <div class="cat-add-form">
+            <div class="row">
+              <input type="text" class="icon-input" id="newStampIcon" maxlength="2" value="${state.newStampIcon}" />
+              <input type="text" class="name-input" id="newStampName" placeholder="例）自分へのご褒美、プレゼント用、等々" value="${state.newStampName}" />
+            </div>
+            <div class="swatches">
+              ${COLOR_PRESETS.map(col=>`<button class="swatch-btn ${state.newStampColor===col?'selected':''}" data-stampswatch="${col}" style="background:${col}"></button>`).join("")}
+            </div>
+            <button class="add-btn" id="addStampBtn">烙印を追加</button>
+          </div>
+        ` : ""}
       </div>
+      <div class="cat-list">${stampListHtml}</div>
     `;
   }
 
@@ -3595,6 +3651,11 @@ function attachHandlers(){
     }
 
     if(state.settingsSubTab === "stamps"){
+      const stampNewBtn = document.getElementById("stampNewBtn");
+      if(stampNewBtn){
+        stampNewBtn.onclick = ()=>{ state.stampAddOpen = !state.stampAddOpen; render(); };
+      }
+
       document.querySelectorAll("[data-del-stamp]").forEach(b=>{
         b.onclick = ()=>{
           const delId = b.dataset.delStamp;
@@ -3628,6 +3689,7 @@ function attachHandlers(){
           });
           state.newStampName = "";
           state.newStampIcon = "🏷️";
+          state.stampAddOpen = false;
           render();
         };
       }
