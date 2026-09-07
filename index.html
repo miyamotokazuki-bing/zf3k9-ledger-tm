@@ -1397,6 +1397,9 @@ const TRANSLATIONS = {
     stamp_mode: "烙印モード", stamp_mode_end: "烙印モードを終了", stamp_mode_hint: "投稿をタップして烙印を押せます",
     stamp_add_new: "新しい焼印",
     stamp_not_needed: "要らなかったもの",
+    cat_food: "食費", cat_transport: "交通費", cat_hobby: "趣味", cat_travel: "旅行",
+    cat_daily: "日用品", cat_cafe: "カフェ", cat_housing: "住居", cat_other: "その他",
+    cat_salary: "給与", cat_parttime: "バイト代", cat_allowance: "お小遣い",
     stamp_selected_hint: "」を選択中 — 投稿をタップして押す／外す", stamp_none_hint: "焼印を追加してから、投稿をタップして押しましょう", stamp_default_name: "烙印",
     complete: "完了",
     month_view: "月", week_view: "週",
@@ -1412,11 +1415,38 @@ const TRANSLATIONS = {
     settings_tips: "Tips",
     font_title: "フォント", frame_title: "思い出カードのフレーム",
     new_category: "＋ 新規カテゴリー", new_stamp: "＋ 新規烙印を追加",
+    no_stamps_yet: "まだ烙印がありません", stamp_name_placeholder: "例）自分へのご褒美、プレゼント用、等々", add_stamp_btn: "烙印を追加",
     logout: "ログアウト", delete_account: "アカウントを削除",
     cancel: "キャンセル", delete: "削除する", add: "追加する",
     this_look: "この見た目にする",
     language_label: "言語", lang_ja: "日本語", lang_en: "English",
     balance: "収支", count_unit: "件",
+    not_set: "未設定", exclude_unbudgeted: "予算未設定のカテゴリーの支出を、予算合計の消化状況に含めない",
+    no_fixed_costs: "固定費はまだ登録されていません",
+    new_cat_title: "新規カテゴリー", icon_placeholder: "絵文字", cat_name_placeholder: "カテゴリ名",
+    used_color_title: "使用中の色です", dine_check_label: "選択時に「外食 ・ 弁当」を選べるようにする（食費用の項目に）",
+    remove_photo: "写真を削除", add_photo: "写真を追加",
+    login_failed: "ログインに失敗しました。もう一度お試しください。",
+    account_delete_reauth: "セキュリティのため、アカウント削除には再ログインが必要です。一度ログアウトしますので、再度ログインしてからもう一度お試しください（記録データはすでに削除されています）。",
+    account_delete_error: "アカウント削除中にエラーが発生しました。もう一度お試しください。",
+    csv_export_error: "CSVの書き出しに失敗しました。もう一度お試しください。",
+    loading: "読み込み中…", no_records: "記録なし", no_week_records: "この週の記録はまだありません",
+    week_income: "週の収入", week_expense: "週の支出", no_budget_cats: "設定タブから予算を登録できます",
+    no_data: "データなし", no_matching_records: "この期間には該当する記録がありません", no_memories_yet: "この期間にはまだ思い出がありません",
+    stamps_applied_label: "押された焼印：",
+    fc_type: "種別", fc_category: "カテゴリ", fc_amount: "金額（円）", fc_day: "毎月の日にち",
+    fc_enddate: "終了日（任意）", fc_no_enddate: "指定しない", fc_add_btn: "固定費を追加", day_unit: "日",
+    cat_edit: "編集", cat_done: "完了",
+    delete_btn: "削除する",
+    show_dining_toggle: "外食回数カウントを表示する（レポートの表示・入力時の外食/自炊の選択、両方に反映されます）",
+    show_bento_toggle: "「弁当」の選択肢を追加する（外食／自炊に加えて選べるようになります）",
+    account_no_login_note: "現在はログインなしで、この端末だけにデータを保存しています。ログインすると、記録をクラウドに保存し、他の端末とも同期できるようになります。",
+    google_signin: "Googleでログイン",
+    account_delete_confirm: "アカウントを削除しますか？", account_delete_note: "クラウド上の記録データも削除され、元に戻せません。",
+    dine_check_tag: "外食チェック", save_btn2: "保存",
+    csv_export_title: "記録をCSVで書き出す", csv_export_desc: "日付・カテゴリ・金額を含むCSVファイルとして書き出せます。表計算ソフト（Excel等）で開いたり、バックアップとして保存したりできます。",
+    csv_range_label: "書き出す範囲：", csv_all_period: "全期間", csv_specify_month: "月を指定", csv_target_count: "対象：",
+    csv_include_label: "含める項目を選択：", csv_dining: "外食／自炊", csv_comment: "コメント", csv_stamps: "押された烙印", csv_fixed: "固定費かどうか", csv_download_btn: "CSVをダウンロード", date_picker_title: "日付を選ぶ",
   },
   en: {
     tab_input: "Add", tab_report: "Report", tab_memory: "Memories", tab_settings: "Settings",
@@ -1429,6 +1459,9 @@ const TRANSLATIONS = {
     stamp_mode: "Stamp mode", stamp_mode_end: "End stamp mode", stamp_mode_hint: "Tap a post to stamp it",
     stamp_add_new: "New stamp",
     stamp_not_needed: "Waste of money",
+    cat_food: "Food", cat_transport: "Transport", cat_hobby: "Hobby", cat_travel: "Travel",
+    cat_daily: "Daily necessities", cat_cafe: "Cafe", cat_housing: "Housing", cat_other: "Other",
+    cat_salary: "Salary", cat_parttime: "Part-time job", cat_allowance: "Allowance",
     stamp_selected_hint: "\" selected — tap a post to stamp / unstamp", stamp_none_hint: "Add a stamp, then tap a post to stamp it", stamp_default_name: "stamp",
     complete: "Done",
     month_view: "Month", week_view: "Week",
@@ -1444,16 +1477,45 @@ const TRANSLATIONS = {
     settings_tips: "Tips",
     font_title: "Font", frame_title: "Memory card frame",
     new_category: "+ New category", new_stamp: "+ Add new stamp",
+    no_stamps_yet: "No stamps yet", stamp_name_placeholder: "e.g. treat yourself, for gifts, etc.", add_stamp_btn: "Add stamp",
     logout: "Log out", delete_account: "Delete account",
     cancel: "Cancel", delete: "Delete", add: "Add",
     this_look: "Use this look",
     language_label: "Language", lang_ja: "日本語", lang_en: "English",
     balance: "Balance", count_unit: "",
+    not_set: "Not set", exclude_unbudgeted: "Exclude spending from categories without a budget from the total budget usage",
+    no_fixed_costs: "No fixed costs registered yet",
+    new_cat_title: "New Category", icon_placeholder: "Emoji", cat_name_placeholder: "Category name",
+    used_color_title: "Already in use", dine_check_label: "Allow choosing \"eating out / bento\" for this category (for food-related items)",
+    remove_photo: "Remove photo", add_photo: "Add photo",
+    login_failed: "Sign-in failed. Please try again.",
+    account_delete_reauth: "For security, deleting your account requires signing in again. You'll be signed out now — please sign in again and retry (your saved records have already been deleted).",
+    account_delete_error: "Something went wrong while deleting your account. Please try again.",
+    csv_export_error: "Failed to export CSV. Please try again.",
+    loading: "Loading…", no_records: "No records", no_week_records: "No records yet this week",
+    week_income: "Income this week", week_expense: "Expense this week", no_budget_cats: "You can set budgets from the Settings tab",
+    no_data: "No data", no_matching_records: "No records for this period", no_memories_yet: "No memories yet for this period",
+    stamps_applied_label: "Stamps applied:",
+    fc_type: "Type", fc_category: "Category", fc_amount: "Amount (yen)", fc_day: "Day of month",
+    fc_enddate: "End date (optional)", fc_no_enddate: "None", fc_add_btn: "Add fixed cost", day_unit: "",
+    cat_edit: "Edit", cat_done: "Done",
+    delete_btn: "Delete",
+    show_dining_toggle: "Show eating-out count (reflected both in the report display and the eating-out/home-cooked choice on the Add tab)",
+    show_bento_toggle: "Add a \"Bento\" option (selectable alongside eating out / home-cooked)",
+    account_no_login_note: "You're currently signed out, and data is saved only on this device. Sign in to save your records to the cloud and sync across devices.",
+    google_signin: "Sign in with Google",
+    account_delete_confirm: "Delete your account?", account_delete_note: "Your cloud-saved records will also be deleted and cannot be recovered.",
+    dine_check_tag: "Dine-out toggle", save_btn2: "Save",
+    csv_export_title: "Export records as CSV", csv_export_desc: "Export a CSV file with date, category, and amount. Open it in spreadsheet software (like Excel) or save it as a backup.",
+    csv_range_label: "Range to export:", csv_all_period: "All time", csv_specify_month: "Pick a month", csv_target_count: "Target: ",
+    csv_include_label: "Choose what to include:", csv_dining: "Eating out / home-cooked", csv_comment: "Comment", csv_stamps: "Applied stamps", csv_fixed: "Whether it's a fixed cost", csv_download_btn: "Download CSV", date_picker_title: "Select date",
   }
 };
 function tr(key){
   const lang = state.language || "ja";
-  return (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS.ja[key] || key;
+  const dict = TRANSLATIONS[lang];
+  if(dict && Object.prototype.hasOwnProperty.call(dict, key)) return dict[key];
+  return TRANSLATIONS.ja[key] || key;
 }
 
 const TOKENS = {
@@ -1497,15 +1559,15 @@ function darkenHex(hex, amt){
   return '#' + out.map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 const FRAME_OPTIONS = {
-  default: { label: "デフォルト" },
-  elegant: { label: "エレガント", baseHue: 35, mode: "sepia" },
-  vine: { label: "ツタ", baseHue: 52, mode: "hue" },
-  handwritten: { label: "手書き", baseHue: 35, mode: "sepia" },
-  china2: { label: "中華", baseHue: 20, mode: "hue" },
-  book: { label: "本", baseHue: 35, mode: "sepia" },
-  ribbon: { label: "リボン", baseHue: 33, mode: "hue" },
-  wafu: { label: "和風", baseHue: 42, mode: "hue" },
-  gakubuchi: { label: "額縁", baseHue: 213, mode: "hue" },
+  default: { label: "デフォルト", labelEn: "Default" },
+  elegant: { label: "エレガント", labelEn: "Elegant", baseHue: 35, mode: "sepia" },
+  vine: { label: "ツタ", labelEn: "Vine", baseHue: 52, mode: "hue" },
+  handwritten: { label: "手書き", labelEn: "Handwritten", baseHue: 35, mode: "sepia" },
+  china2: { label: "中華", labelEn: "Chinese", baseHue: 20, mode: "hue" },
+  book: { label: "本", labelEn: "Book", baseHue: 35, mode: "sepia" },
+  ribbon: { label: "リボン", labelEn: "Ribbon", baseHue: 33, mode: "hue" },
+  wafu: { label: "和風", labelEn: "Japanese", baseHue: 42, mode: "hue" },
+  gakubuchi: { label: "額縁", labelEn: "Picture frame", baseHue: 213, mode: "hue" },
 };
 function wrapCardFrame(innerHtml, color, rotateDeg){
   const style = FRAME_OPTIONS[state.selectedFrame] ? state.selectedFrame : "default";
@@ -1584,7 +1646,23 @@ function memoriesLabel(dateLabel){
 }
 function stampDisplayName(stamp){
   if(!stamp) return "";
-  return stamp.id === "not_needed" ? tr("stamp_not_needed") : stamp.name;
+  if(stamp.id === "not_needed" || stamp.name === "要らなかったもの") return tr("stamp_not_needed");
+  return stamp.name;
+}
+const DEFAULT_CAT_NAME_KEYS = {
+  food:"cat_food", transport:"cat_transport", hobby:"cat_hobby", travel:"cat_travel",
+  daily:"cat_daily", cafe:"cat_cafe", housing:"cat_housing", other:"cat_other",
+  salary:"cat_salary", parttime:"cat_parttime", allowance:"cat_allowance", other_income:"cat_other",
+};
+const DEFAULT_CAT_NAME_BY_JA = {
+  "食費":"cat_food", "交通費":"cat_transport", "趣味":"cat_hobby", "旅行":"cat_travel",
+  "日用品":"cat_daily", "カフェ":"cat_cafe", "住居":"cat_housing", "その他":"cat_other",
+  "給与":"cat_salary", "バイト代":"cat_parttime", "お小遣い":"cat_allowance",
+};
+function categoryDisplayName(cat){
+  if(!cat) return "";
+  const key = DEFAULT_CAT_NAME_KEYS[cat.id] || DEFAULT_CAT_NAME_BY_JA[cat.name];
+  return key ? tr(key) : cat.name;
 }
 const WHEEL_ROW_HEIGHT = 38;
 
@@ -1698,11 +1776,11 @@ let state = {
 
 // 固定費から指定月の仮想取引を生成
 function exportTransactionsCSV(){
-  const headers = ["日付","種別","カテゴリ","金額"];
-  if(state.csvIncludeDining) headers.push("外食/自炊");
-  if(state.csvIncludeComment) headers.push("コメント");
-  if(state.csvIncludeStamps) headers.push("烙印");
-  if(state.csvIncludeFixed) headers.push("固定費");
+  const headers = state.language==="en" ? ["Date","Type","Category","Amount"] : ["日付","種別","カテゴリ","金額"];
+  if(state.csvIncludeDining) headers.push(state.language==="en" ? "Eating out/Home-cooked" : "外食/自炊");
+  if(state.csvIncludeComment) headers.push(tr("csv_comment"));
+  if(state.csvIncludeStamps) headers.push(state.language==="en" ? "Stamps" : "烙印");
+  if(state.csvIncludeFixed) headers.push(state.language==="en" ? "Fixed cost" : "固定費");
 
   const escapeCsv = (v)=>{
     const s = (v===null || v===undefined) ? "" : String(v);
@@ -1724,17 +1802,17 @@ function exportTransactionsCSV(){
         const s = state.stamps.find(x=>x.id===sid);
         return s ? stampDisplayName(s) : "";
       }).filter(Boolean).join("、");
-      const diningLabel = t.diningOut===true ? "外食" : t.diningOut===false ? "自炊" : t.diningOut==="bento" ? "弁当" : "";
+      const diningLabel = t.diningOut===true ? tr("dining_out") : t.diningOut===false ? tr("self_cook") : t.diningOut==="bento" ? tr("bento") : "";
       const row = [
         t.date,
-        t.type==="income" ? "収入" : "支出",
-        cat ? cat.name : "",
+        t.type==="income" ? tr("income") : tr("expense"),
+        cat ? categoryDisplayName(cat) : "",
         t.amount,
       ];
       if(state.csvIncludeDining) row.push(diningLabel);
       if(state.csvIncludeComment) row.push(t.comment || "");
       if(state.csvIncludeStamps) row.push(stampNames);
-      if(state.csvIncludeFixed) row.push(t.isFixed ? "固定費" : "");
+      if(state.csvIncludeFixed) row.push(t.isFixed ? (state.language==="en" ? "Fixed cost" : "固定費") : "");
       return row.map(escapeCsv).join(",");
     });
   const csv = "\uFEFF" + [headers.map(escapeCsv).join(","), ...rows].join("\r\n");
@@ -1898,7 +1976,7 @@ function loadState(){
 }
 
 function renderAuthLoading(){
-  return `<div class="auth-loading">読み込み中…</div>`;
+  return `<div class="auth-loading">${tr("loading")}</div>`;
 }
 
 function introBodyHtml(){
@@ -1949,7 +2027,7 @@ function introBodyHtml(){
 function renderIntroScreen(){
   return `
     <div class="intro-screen">
-      <div class="intro-logo">思い出家計簿</div>
+      <div class="intro-logo">${state.language==="en" ? "Omoide Kakeibo" : "思い出家計簿"}</div>
       <div class="intro-body">
         ${introBodyHtml()}
       </div>
@@ -2044,21 +2122,21 @@ function renderDatePickerSheet(){
     const days = Array.from({length:dim},(_,i)=>i+1);
     sheet.innerHTML = `
       <div class="calc-sheet-handle"></div>
-      <div class="date-picker-title">日付を選ぶ</div>
+      <div class="date-picker-title">${tr("date_picker_title")}</div>
       <div class="wheel-row">
         <div class="wheel-col" id="wheelYear">
           <div class="wheel-pad-top"></div>
-          ${years.map(y=>`<div class="wheel-item" data-val="${y}">${y}年</div>`).join("")}
+          ${years.map(y=>`<div class="wheel-item" data-val="${y}">${y}${state.language==="en"?"":"年"}</div>`).join("")}
           <div class="wheel-pad-bottom"></div>
         </div>
         <div class="wheel-col" id="wheelMonth">
           <div class="wheel-pad-top"></div>
-          ${months.map(m=>`<div class="wheel-item" data-val="${m}">${m}月</div>`).join("")}
+          ${months.map(m=>`<div class="wheel-item" data-val="${m}">${state.language==="en"?MONTH_NAMES_EN[m-1]:m+"月"}</div>`).join("")}
           <div class="wheel-pad-bottom"></div>
         </div>
         <div class="wheel-col" id="wheelDay">
           <div class="wheel-pad-top"></div>
-          ${days.map(d=>`<div class="wheel-item" data-val="${d}">${d}日</div>`).join("")}
+          ${days.map(d=>`<div class="wheel-item" data-val="${d}">${d}${state.language==="en"?"":"日"}</div>`).join("")}
           <div class="wheel-pad-bottom"></div>
         </div>
         <div class="wheel-center-line"></div>
@@ -2094,7 +2172,7 @@ function refreshDayWheel(){
   if(!el) return;
   el.innerHTML = `
     <div class="wheel-pad-top"></div>
-    ${days.map(d=>`<div class="wheel-item" data-val="${d}">${d}日</div>`).join("")}
+    ${days.map(d=>`<div class="wheel-item" data-val="${d}">${d}${state.language==="en"?"":"日"}</div>`).join("")}
     <div class="wheel-pad-bottom"></div>
   `;
   scrollWheelToValue("wheelDay", state.datePickerDay, days);
@@ -2109,7 +2187,7 @@ function renderCalcSheet(){
     backdrop.classList.add("open");
     sheet.innerHTML = `
       <div class="calc-sheet-handle"></div>
-      <div class="calc-amount-preview">${state.inputAmount ? Number(state.inputAmount).toLocaleString('ja-JP') : '0'}<span style="font-size:14px; color:var(--ink60); margin-left:4px;">円</span></div>
+      <div class="calc-amount-preview">${state.inputAmount ? Number(state.inputAmount).toLocaleString('ja-JP') : '0'}<span style="font-size:14px; color:var(--ink60); margin-left:4px;">${tr("yen_unit")}</span></div>
       <div class="calc-grid">
         <button class="calc-key" style="grid-area:n7" data-key="7">7</button>
         <button class="calc-key" style="grid-area:n8" data-key="8">8</button>
@@ -2197,7 +2275,7 @@ function renderInput(){
       ${catsOfType.map(c=>`
         <button class="cat-btn ${state.inputCat===c.id?'active':''}" data-cat="${c.id}" style="border-color:${state.inputCat===c.id?c.color:'transparent'}">
           <span class="emoji">${c.icon}</span>
-          <span class="name">${c.name}</span>
+          <span class="name">${categoryDisplayName(c)}</span>
         </button>
       `).join("")}
       <button class="cat-btn cat-edit-tile" id="catManageBtn">
@@ -2243,7 +2321,7 @@ function renderTxRow(t){
   const commentShort = t.comment ? (t.comment.length > 15 ? t.comment.slice(0,15) + '…' : t.comment) : '';
   return `
     <div class="tx-row">
-      <span class="name">${c.icon} ${c.name} ${t.isFixed ? '<span class="fixed-badge">固定</span>' : ''} ${t.diningOut===true ? '<span class="fixed-badge">外食</span>' : ''} ${t.diningOut==='bento' ? '<span class="fixed-badge">弁当</span>' : ''}</span>
+      <span class="name">${c.icon} ${categoryDisplayName(c)} ${t.isFixed ? `<span class="fixed-badge">${state.language==="en"?"Fixed":"固定"}</span>` : ''} ${t.diningOut===true ? `<span class="fixed-badge">${tr("dining_out")}</span>` : ''} ${t.diningOut==='bento' ? `<span class="fixed-badge">${tr("bento")}</span>` : ''}</span>
       ${commentShort ? `<span class="tx-comment">${commentShort}</span>` : ''}
       <span class="amt" style="color:${t.type==='income'?TOKENS.moss:TOKENS.bengara}">${t.type==='income'?'+':'-'}${yen(t.amount)}</span>
     </div>
@@ -2254,7 +2332,7 @@ function renderDayDetailBlock(dateStr, dayList){
   return `
     <div class="day-detail">
       <div class="ttl">${dateStr} の記録</div>
-      ${dayList.length===0 ? `<div class="empty" style="padding:10px 0;">記録なし</div>` : dayList.map(t=>renderTxRow(t)).join("")}
+      ${dayList.length===0 ? `<div class="empty" style="padding:10px 0;">${tr("no_records")}</div>` : dayList.map(t=>renderTxRow(t)).join("")}
     </div>
   `;
 }
@@ -2320,7 +2398,7 @@ function renderWeekView(){
   if(!state.weekAnchor) state.weekAnchor = fmtDate(startOfWeek(TODAY));
   const anchor = new Date(state.weekAnchor+'T00:00:00');
   const dates = Array.from({length:7},(_,i)=>{ const d=new Date(anchor); d.setDate(anchor.getDate()+i); return fmtDate(d); });
-  const weekdayLabels=["日","月","火","水","木","金","土"];
+  const weekdayLabels = state.language==="en" ? ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"] : ["日","月","火","水","木","金","土"];
 
   const infos = dates.map(dt=>{
     const tx = txForDate(dt);
@@ -2348,7 +2426,7 @@ function renderWeekView(){
 
   const hasAny = infos.some(i=>i.tx.length>0);
   const listHtml = !hasAny
-    ? `<div class="empty" style="padding:20px 0;">この週の記録はまだありません</div>`
+    ? `<div class="empty" style="padding:20px 0;">${tr("no_week_records")}</div>`
     : infos.filter(i=>i.tx.length>0).map(info=>`
         <div class="day-detail" style="margin-top:14px;">
           <div class="ttl">${weekdayLabels[dates.indexOf(info.dt)]}曜日・${info.dt}</div>
@@ -2364,8 +2442,8 @@ function renderWeekView(){
     </div>
     <div class="grid" style="grid-template-columns:repeat(7,1fr);">${cellsHtml}</div>
     <div class="week-summary">
-      <span>週の収入 ${yen(weekIncomeTotal)}</span>
-      <span>週の支出 ${yen(weekExpenseTotal)}</span>
+      <span>${tr("week_income")} ${yen(weekIncomeTotal)}</span>
+      <span>${tr("week_expense")} ${yen(weekExpenseTotal)}</span>
     </div>
     ${listHtml}
   `;
@@ -2407,12 +2485,12 @@ function renderReport(){
 
   const byCat = state.categories.filter(c=>c.type==="expense").map(c=>{
     const sum = monthTx.filter(t=>t.type==="expense" && t.categoryId===c.id).reduce((s,t)=>s+t.amount,0);
-    return {id:c.id, name:c.name, value:sum, color:c.color};
+    return {id:c.id, name:categoryDisplayName(c), value:sum, color:c.color};
   }).filter(d=>d.value>0).sort((a,b)=>b.value-a.value);
 
   const byCatIncome = state.categories.filter(c=>c.type==="income").map(c=>{
     const sum = monthTx.filter(t=>t.type==="income" && t.categoryId===c.id).reduce((s,t)=>s+t.amount,0);
-    return {id:c.id, name:c.name, value:sum, color:c.color};
+    return {id:c.id, name:categoryDisplayName(c), value:sum, color:c.color};
   }).filter(d=>d.value>0).sort((a,b)=>b.value-a.value);
 
   function buildPieSvg(data){
@@ -2504,7 +2582,7 @@ function renderReport(){
     return `
       <div class="budget-row">
         <div class="top">
-          <span class="cat">${c.icon} ${c.name}</span>
+          <span class="cat">${c.icon} ${categoryDisplayName(c)}</span>
           <span style="color:${over?TOKENS.bengara:'var(--ink60)'}">${yen(spent)} / ${yen(budget)}　<b>${pctDisplay}%</b></span>
         </div>
         <div class="budget-bar-bg">
@@ -2540,7 +2618,7 @@ function renderReport(){
         <div class="report-title" id="budgetSectionTitle" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
           <span>${!state.reportSectionSwapped ? `<button class="section-swap-btn" id="reportSwapBtn">${SWAP_ICON_SVG}</button> ` : ''}${tr("budget_status")}</span>
         </div>
-        ${budgetCats.length===0 ? `<div class="empty">設定タブから予算を登録できます</div>` : `
+        ${budgetCats.length===0 ? `<div class="empty">${tr("no_budget_cats")}</div>` : `
           <div class="budget-section">
             ${budgetRowsHtml}
             <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--line); font-size:11.5px; color:var(--ink60); display:flex; justify-content:space-between;">
@@ -2604,7 +2682,7 @@ function renderReport(){
           <div class="cat-swipe-track" id="catSwipeTrack" style="transform:translateX(${state.reportCatView==='expense'?'0%':'-50%'})">
             <div class="cat-slide">
               <div class="report-title">${tr("category_breakdown_expense")}</div>
-              ${byCat.length===0 ? `<div class="empty">データなし</div>` : `
+              ${byCat.length===0 ? `<div class="empty">${tr("no_data")}</div>` : `
                 <div class="pie-wrap">${pieSvg}</div>
                 <div class="legend">
                   ${(() => { const totalExp = byCat.reduce((s,d)=>s+d.value,0); return byCat.map(d=>`
@@ -2620,7 +2698,7 @@ function renderReport(){
             </div>
             <div class="cat-slide">
               <div class="report-title">${tr("category_breakdown_income")}</div>
-              ${byCatIncome.length===0 ? `<div class="empty">データなし</div>` : `
+              ${byCatIncome.length===0 ? `<div class="empty">${tr("no_data")}</div>` : `
                 <div class="pie-wrap">${pieSvgIncome}</div>
                 <div class="legend">
                   ${(() => { const totalInc = byCatIncome.reduce((s,d)=>s+d.value,0); return byCatIncome.map(d=>`
@@ -2650,7 +2728,7 @@ function renderReport(){
 
 // ---------- MEMORY ----------
 function buildSimpleMemoryCards(txList){
-  if(txList.length === 0) return `<div class="empty">この期間には該当する記録がありません</div>`;
+  if(txList.length === 0) return `<div class="empty">${tr("no_matching_records")}</div>`;
   return txList.slice().reverse().sort((a,b)=> a.date===b.date ? 0 : (a.date < b.date ? 1 : -1)).map((t,i)=>{
     const c = catOf(t.categoryId);
     const rotate = i%2===0 ? -1.2 : 1.4;
@@ -2669,12 +2747,12 @@ function buildSimpleMemoryCards(txList){
         <div class="memory-card" data-open-memory-report="${t.id}">
           ${stampBadgesHtml}
           <div class="top">
-            <span class="badge" style="background:${c.color}">${c.icon} ${c.name}</span>
+            <span class="badge" style="background:${c.color}">${c.icon} ${categoryDisplayName(c)}</span>
             <span class="date">${t.date}</span>
             <span class="amt" style="color:${t.type==='income'?TOKENS.moss:TOKENS.bengara}">${t.type==='income'?'+':'-'}${yen(t.amount)}</span>
           </div>
           ${t.photo ? `<img src="${t.photo}" />` : ''}
-          <div class="cmt ${t.comment?'':'cmt-empty'}">${t.comment || '例：店の名前、一言思い出。'}</div>
+          <div class="cmt ${t.comment?'':'cmt-empty'}">${t.comment || tr("memo_placeholder")}</div>
         </div>
     `;
     return wrapCardFrame(innerHtml, c.color, rotate);
@@ -2747,23 +2825,23 @@ function renderMemory(){
       </div>
       ${state.stampQuickAddOpen ? `
         <div class="stamp-quick-add-form">
-          <input type="text" id="quickStampName" placeholder="例）自分へのご褒美、プレゼント用、等々" value="${state.newStampName}" />
-          <button id="quickStampAddBtn">追加</button>
+          <input type="text" id="quickStampName" placeholder="${tr("stamp_name_placeholder")}" value="${state.newStampName}" />
+          <button id="quickStampAddBtn">${tr("add")}</button>
         </div>
       ` : ''}
-      ${state.stamps.length>0 ? `<div class="stamp-hint">${state.language==="en"?'"':'「'}${state.stamps.find(s=>s.id===state.activeStampId)?.name || tr("stamp_default_name")}${tr("stamp_selected_hint")}</div>` : `<div class="stamp-hint">${tr("stamp_none_hint")}</div>`}
+      ${state.stamps.length>0 ? `<div class="stamp-hint">${state.language==="en"?'"':'「'}${stampDisplayName(state.stamps.find(s=>s.id===state.activeStampId)) || tr("stamp_default_name")}${tr("stamp_selected_hint")}</div>` : `<div class="stamp-hint">${tr("stamp_none_hint")}</div>`}
     `;
   }
 
   const filterHtml = `
     <div class="filter-row">
       <button class="pill ${state.memoryFilter==='all'?'active':''}" data-filter="all">${tr("all_filter")}</button>
-      ${usedCats.map(c=>`<button class="pill ${state.memoryFilter===c.id?'active':''}" data-filter="${c.id}">${c.icon} ${c.name}</button>`).join("")}
+      ${usedCats.map(c=>`<button class="pill ${state.memoryFilter===c.id?'active':''}" data-filter="${c.id}">${c.icon} ${categoryDisplayName(c)}</button>`).join("")}
     </div>
   `;
 
   const cardsHtml = sorted.length===0
-    ? `<div class="empty">この期間にはまだ思い出がありません</div>`
+    ? `<div class="empty">${tr("no_memories_yet")}</div>`
     : sorted.map((t,i)=>{
         const c = catOf(t.categoryId);
         const rotate = i%2===0 ? -1.2 : 1.4;
@@ -2776,28 +2854,28 @@ function renderMemory(){
             <div class="memory-card editing">
               ${editTxStamps.length>0 ? `
                 <div class="edit-stamps-row">
-                  <span class="lbl-mini">押された焼印：</span>
+                  <span class="lbl-mini">${tr("stamps_applied_label")}</span>
                   ${editTxStamps.map(s=>`<span class="edit-stamp-chip" data-remove-edit-stamp="${s.id}">${stampDisplayName(s)} ✕</span>`).join("")}
                 </div>
               ` : ''}
               <div class="edit-field-row">
                 <select data-edit-cat>
-                  ${catsOfType.map(cc=>`<option value="${cc.id}" ${draft.categoryId===cc.id?'selected':''}>${cc.icon} ${cc.name}</option>`).join("")}
+                  ${catsOfType.map(cc=>`<option value="${cc.id}" ${draft.categoryId===cc.id?'selected':''}>${cc.icon} ${categoryDisplayName(cc)}</option>`).join("")}
                 </select>
                 <input type="number" min="0" data-edit-amount value="${draft.amount}" />
               </div>
               <div class="edit-photo-row">
                 <input type="file" accept="image/*" id="editPhotoInput" style="display:none" />
                 ${draft.photo
-                  ? `<img src="${draft.photo}" /><button class="edit-photo-btn" data-edit-photo-remove>写真を削除</button>`
-                  : `<button class="edit-photo-btn" data-edit-photo-add>写真を追加</button>`
+                  ? `<img src="${draft.photo}" /><button class="edit-photo-btn" data-edit-photo-remove>${tr("remove_photo")}</button>`
+                  : `<button class="edit-photo-btn" data-edit-photo-add>${tr("add_photo")}</button>`
                 }
               </div>
-              <textarea class="edit-comment" data-edit-comment placeholder="例：店の名前、一言思い出。">${draft.comment}</textarea>
+              <textarea class="edit-comment" data-edit-comment placeholder="${tr("memo_placeholder")}">${draft.comment}</textarea>
               <div class="edit-actions">
-                <button class="btn-save" data-save-memory>保存</button>
-                <button class="btn-delete" data-delete-memory>削除</button>
-                <button class="btn-cancel" data-cancel-memory>キャンセル</button>
+                <button class="btn-save" data-save-memory>${tr("save_btn2")}</button>
+                <button class="btn-delete" data-delete-memory>${tr("delete_btn")}</button>
+                <button class="btn-cancel" data-cancel-memory>${tr("cancel")}</button>
               </div>
             </div>
           `;
@@ -2822,12 +2900,12 @@ function renderMemory(){
             <div class="memory-card ${state.reflectionMode?'stamp-mode':''} ${hasActiveStamp?'stamped-active':''}" ${clickAttr}>
               ${stampBadgesHtml}
               <div class="top">
-                <span class="badge" style="background:${c.color}">${c.icon} ${c.name}</span>
+                <span class="badge" style="background:${c.color}">${c.icon} ${categoryDisplayName(c)}</span>
                 <span class="date">${t.date}</span>
                 <span class="amt" style="color:${t.type==='income'?TOKENS.moss:TOKENS.bengara}">${t.type==='income'?'+':'-'}${yen(t.amount)}</span>
               </div>
               ${t.photo ? `<img src="${t.photo}" />` : ''}
-              <div class="cmt ${t.comment?'':'cmt-empty'}">${t.comment || '例：店の名前、一言思い出。'}</div>
+              <div class="cmt ${t.comment?'':'cmt-empty'}">${t.comment || tr("memo_placeholder")}</div>
             </div>
         `;
         return wrapCardFrame(innerHtml, c.color, rotate);
@@ -2847,7 +2925,7 @@ function buildCategoryListHtml(){
       <div class="cat-list-item editing-cat" data-cat-id="${c.id}" data-cat-type="${c.type}">
         <input type="text" class="cat-edit-icon" id="catEditIcon" maxlength="2" value="${state.editCatIcon}" />
         <input type="text" class="cat-edit-name" id="catEditName" value="${state.editCatName}" />
-        <button class="cat-edit-save" data-cat-save="${c.id}">保存</button>
+        <button class="cat-edit-save" data-cat-save="${c.id}">${tr("save_btn2")}</button>
         <button class="cat-edit-cancel" data-cat-cancel="${c.id}">✕</button>
       </div>
     `;
@@ -2857,9 +2935,9 @@ function buildCategoryListHtml(){
     <div class="cat-list-item ${state.catSelectMode?'selectable':''} ${isSelected?'selected':''}" ${clickAttr} data-cat-id="${c.id}" data-cat-type="${c.type}">
       ${state.catSelectMode ? `<span class="cat-checkbox ${isSelected?'checked':''}">${isSelected?'✓':''}</span>` : ''}
       <span class="swatch" style="background:${c.color}"></span>
-      <span class="nm" ${!state.catSelectMode ? `data-cat-edit-open="${c.id}"` : ''}>${c.icon} ${c.name}
-        <span class="type-tag ${c.type}">${c.type==='income'?'収入':'支出'}</span>
-        ${c.diningOutEnabled ? '<span class="dine-tag">外食チェック</span>' : ''}
+      <span class="nm" ${!state.catSelectMode ? `data-cat-edit-open="${c.id}"` : ''}>${c.icon} ${categoryDisplayName(c)}
+        <span class="type-tag ${c.type}">${c.type==='income'?tr("income"):tr("expense")}</span>
+        ${c.diningOutEnabled ? `<span class="dine-tag">${tr("dine_check_tag")}</span>` : ''}
       </span>
       ${!state.catSelectMode ? `
         <span class="cat-drag-handle" data-cat-drag="${c.id}">⠿</span>
@@ -2929,8 +3007,8 @@ function renderFramePreview(){
   screen.innerHTML = `
     <div class="frame-preview-header">
       <button class="frame-preview-back" id="framePreviewBackBtn">‹</button>
-      <span class="frame-preview-title">${opt.label}</span>
-      <button class="frame-preview-select-btn" id="framePreviewSelectBtn">この見た目にする</button>
+      <span class="frame-preview-title">${state.language==="en" ? opt.labelEn : opt.label}</span>
+      <button class="frame-preview-select-btn" id="framePreviewSelectBtn">${tr("this_look")}</button>
     </div>
     <div class="memory-neu">
       <div class="memories">${cardsHtml}</div>
@@ -2948,16 +3026,18 @@ function renderCatManageSheet(){
 
     const selectBarHtml = `
       <div class="cat-select-bar">
-        <button class="cat-select-toggle ${state.catSelectMode?'on':''}" id="catSelectModeToggle">${state.catSelectMode ? '完了' : '編集'}</button>
-        ${state.catSelectMode ? `<button class="cat-delete-selected-btn" id="catDeleteSelectedBtn" ${state.catSelectedIds.length===0?'disabled':''}>${state.catSelectedIds.length}件を削除</button>` : ''}
+        <button class="cat-select-toggle ${state.catSelectMode?'on':''}" id="catSelectModeToggle">${state.catSelectMode ? tr("cat_done") : tr("cat_edit")}</button>
+        ${state.catSelectMode ? `<button class="cat-delete-selected-btn" id="catDeleteSelectedBtn" ${state.catSelectedIds.length===0?'disabled':''}>${state.language==="en" ? `Delete (${state.catSelectedIds.length})` : `${state.catSelectedIds.length}件を削除`}</button>` : ''}
       </div>
     `;
     const confirmHtml = state.catDeleteConfirm ? `
       <div class="cat-delete-confirm">
-        <p>選択した${state.catSelectedIds.length}件のジャンルを削除しますか？<br>関連する記録・固定費は「その他」に振り替わります。</p>
+        <p>${state.language==="en"
+          ? `Delete the ${state.catSelectedIds.length} selected categories?<br>Related records and fixed costs will be moved to "Other".`
+          : `選択した${state.catSelectedIds.length}件のジャンルを削除しますか？<br>関連する記録・固定費は「その他」に振り替わります。`}</p>
         <div class="row">
-          <button class="btn-confirm" id="catDeleteConfirmBtn">削除する</button>
-          <button class="btn-cancel" id="catDeleteCancelBtn">キャンセル</button>
+          <button class="btn-confirm" id="catDeleteConfirmBtn">${tr("delete_btn")}</button>
+          <button class="btn-cancel" id="catDeleteCancelBtn">${tr("cancel")}</button>
         </div>
       </div>
     ` : "";
@@ -2966,10 +3046,10 @@ function renderCatManageSheet(){
       <div class="calc-sheet-handle"></div>
       <div class="cat-manage-header">
         <button class="cat-manage-close" id="catManageCloseBtn">✕</button>
-        <span class="cat-manage-title">カテゴリー</span>
+        <span class="cat-manage-title">${tr("settings_category")}</span>
         <span style="width:32px;"></span>
       </div>
-      <button class="cat-new-btn" id="catNewBtn">＋ 新規カテゴリー</button>
+      <button class="cat-new-btn" id="catNewBtn">${tr("new_category")}</button>
       ${selectBarHtml}
       ${confirmHtml}
       <div class="cat-list">${buildCategoryListHtml()}</div>
@@ -2991,28 +3071,28 @@ function renderCatAddSheet(){
       <div class="calc-sheet-handle"></div>
       <div class="cat-manage-header">
         <button class="cat-manage-close" id="catAddCloseBtn">✕</button>
-        <span class="cat-manage-title">新規カテゴリー</span>
+        <span class="cat-manage-title">${tr("new_cat_title")}</span>
         <span style="width:32px;"></span>
       </div>
       <div class="switch" style="margin-bottom:12px;">
-        <button data-newcattype="expense" class="${state.newCatType==='expense'?'active':''}">支出</button>
-        <button data-newcattype="income" class="${state.newCatType==='income'?'active':''}">収入</button>
+        <button data-newcattype="expense" class="${state.newCatType==='expense'?'active':''}">${tr("expense")}</button>
+        <button data-newcattype="income" class="${state.newCatType==='income'?'active':''}">${tr("income")}</button>
       </div>
       <div class="row">
-        <input type="text" class="icon-input" id="newCatIcon" maxlength="2" placeholder="絵文字" value="${state.newCatIcon}" />
-        <input type="text" class="name-input" id="newCatName" placeholder="カテゴリ名" value="${state.newCatName}" />
+        <input type="text" class="icon-input" id="newCatIcon" maxlength="2" placeholder="${tr("icon_placeholder")}" value="${state.newCatIcon}" />
+        <input type="text" class="name-input" id="newCatName" placeholder="${tr("cat_name_placeholder")}" value="${state.newCatName}" />
       </div>
       <div class="swatches">
         ${COLOR_PRESETS.map(col=>{
           const used = state.categories.some(c=>c.color===col) && state.newCatColor!==col;
-          return `<button class="swatch-btn ${state.newCatColor===col?'selected':''} ${used?'used':''}" data-swatch="${col}" style="background:${col}" ${used?'disabled title="使用中の色です"':''}></button>`;
+          return `<button class="swatch-btn ${state.newCatColor===col?'selected':''} ${used?'used':''}" data-swatch="${col}" style="background:${col}" ${used?`disabled title="${tr("used_color_title")}"`:''}></button>`;
         }).join("")}
       </div>
       <label class="dine-check">
         <input type="checkbox" id="newCatDining" ${state.newCatDining?'checked':''} />
-        <span>選択時に「外食 ・ 弁当」を選べるようにする（食費用の項目に）</span>
+        <span>${tr("dine_check_label")}</span>
       </label>
-      <button class="add-btn" id="catAddSubmitBtn">追加する</button>
+      <button class="add-btn" id="catAddSubmitBtn">${tr("add")}</button>
     `;
   } else {
     sheet.classList.remove("open");
@@ -3043,43 +3123,43 @@ function renderSettings(){
     return `
       ${sub}
       <div style="padding:16px;">
-        <div class="report-title" style="padding:0; margin-bottom:8px;">記録をCSVで書き出す</div>
+        <div class="report-title" style="padding:0; margin-bottom:8px;">${tr("csv_export_title")}</div>
         <p style="font-size:12px; color:var(--ink60); line-height:1.7; margin:0 0 16px;">
-          日付・カテゴリ・金額を含むCSVファイルとして書き出せます。表計算ソフト（Excel等）で開いたり、バックアップとして保存したりできます。
+          ${tr("csv_export_desc")}
         </p>
 
-        <div style="font-size:12px; color:var(--ink60); margin-bottom:8px;">書き出す範囲：</div>
+        <div style="font-size:12px; color:var(--ink60); margin-bottom:8px;">${tr("csv_range_label")}</div>
         <div class="switch" style="margin-bottom:${state.csvPeriodMode==='month'?'10px':'16px'};">
-          <button data-csvperiod="all" class="${state.csvPeriodMode!=='month'?'active':''}">全期間</button>
-          <button data-csvperiod="month" class="${state.csvPeriodMode==='month'?'active':''}">月を指定</button>
+          <button data-csvperiod="all" class="${state.csvPeriodMode!=='month'?'active':''}">${tr("csv_all_period")}</button>
+          <button data-csvperiod="month" class="${state.csvPeriodMode==='month'?'active':''}">${tr("csv_specify_month")}</button>
         </div>
         ${state.csvPeriodMode==='month' ? `
           <div class="cal-head" style="margin-bottom:16px;">
             <button class="nav-round" id="csvPrevMonth">‹</button>
-            <span class="ym" style="font-size:15px;">${state.csvYear}年 ${state.csvMonth+1}月</span>
+            <span class="ym" style="font-size:15px;">${formatYearMonth(state.csvYear, state.csvMonth)}</span>
             <button class="nav-round" id="csvNextMonth">›</button>
           </div>
         ` : ''}
-        <div style="font-size:11.5px; color:var(--ink60); margin:-6px 0 16px;">対象：${txCountInRange}件</div>
+        <div style="font-size:11.5px; color:var(--ink60); margin:-6px 0 16px;">${tr("csv_target_count")}${txCountInRange}${tr("count_unit")}</div>
 
-        <div style="font-size:12px; color:var(--ink60); margin-bottom:8px;">含める項目を選択：</div>
+        <div style="font-size:12px; color:var(--ink60); margin-bottom:8px;">${tr("csv_include_label")}</div>
         <label class="exclude-toggle" style="padding:8px 0;">
           <input type="checkbox" id="csvIncludeDining" ${state.csvIncludeDining?'checked':''} />
-          <span>外食／自炊</span>
+          <span>${tr("csv_dining")}</span>
         </label>
         <label class="exclude-toggle" style="padding:8px 0;">
           <input type="checkbox" id="csvIncludeComment" ${state.csvIncludeComment?'checked':''} />
-          <span>コメント</span>
+          <span>${tr("csv_comment")}</span>
         </label>
         <label class="exclude-toggle" style="padding:8px 0;">
           <input type="checkbox" id="csvIncludeStamps" ${state.csvIncludeStamps?'checked':''} />
-          <span>押された烙印</span>
+          <span>${tr("csv_stamps")}</span>
         </label>
         <label class="exclude-toggle" style="padding:8px 0 16px;">
           <input type="checkbox" id="csvIncludeFixed" ${state.csvIncludeFixed?'checked':''} />
-          <span>固定費かどうか</span>
+          <span>${tr("csv_fixed")}</span>
         </label>
-        <button class="add-btn" id="exportCsvBtn">CSVをダウンロード</button>
+        <button class="add-btn" id="exportCsvBtn">${tr("csv_download_btn")}</button>
       </div>
     `;
   }
@@ -3090,11 +3170,11 @@ function renderSettings(){
         ${sub}
         <div style="padding:16px;">
           <p style="font-size:12px; color:var(--ink60); line-height:1.7; margin:0 0 16px;">
-            現在はログインなしで、この端末だけにデータを保存しています。ログインすると、記録をクラウドに保存し、他の端末とも同期できるようになります。
+            ${tr("account_no_login_note")}
           </p>
           <button class="auth-google-btn" id="settingsGoogleSignInBtn">
             <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.1-7.9 19.1-19.6 0-1.3-.1-2.6-.3-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 16 4 9.1 8.6 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.4 0 10.2-1.9 13.9-5.1l-6.4-5.4C29.6 35.4 26.9 36.4 24 36.4c-5.3 0-9.7-3.4-11.3-8.1l-6.6 5.1C9 39.3 15.9 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.4 5.4C40.4 36.5 44 30.9 44 24c0-1.3-.1-2.6-.4-3.5z"/></svg>
-            <span>Googleでログイン</span>
+            <span>${tr("google_signin")}</span>
           </button>
         </div>
       `;
@@ -3104,17 +3184,17 @@ function renderSettings(){
       <div class="account-row">
         <span class="email">${state.authUser ? state.authUser.email : ''}</span>
       </div>
-      <button class="account-btn logout" id="logoutBtn">ログアウト</button>
+      <button class="account-btn logout" id="logoutBtn">${tr("logout")}</button>
       ${state.accountDeleteConfirm ? `
         <div class="cat-delete-confirm" style="margin:0 16px 14px;">
-          <p>アカウントを削除しますか？<br>クラウド上の記録データも削除され、元に戻せません。</p>
+          <p>${tr("account_delete_confirm")}<br>${tr("account_delete_note")}</p>
           <div class="row">
-            <button class="btn-confirm" id="accountDeleteConfirmBtn">削除する</button>
-            <button class="btn-cancel" id="accountDeleteCancelBtn">キャンセル</button>
+            <button class="btn-confirm" id="accountDeleteConfirmBtn">${tr("delete_btn")}</button>
+            <button class="btn-cancel" id="accountDeleteCancelBtn">${tr("cancel")}</button>
           </div>
         </div>
       ` : `
-        <button class="account-btn delete" id="accountDeleteBtn">アカウントを削除</button>
+        <button class="account-btn delete" id="accountDeleteBtn">${tr("delete_account")}</button>
       `}
     `;
   }
@@ -3122,8 +3202,8 @@ function renderSettings(){
   if(state.settingsSubTab === "budget"){
     const rows = state.categories.filter(c=>c.type==="expense").map(c=>`
       <div class="budget-edit-row">
-        <span class="catlabel">${c.icon} ${c.name}</span>
-        <input type="number" min="0" step="100" placeholder="未設定" value="${state.budgets[c.id] ?? ''}" data-budget-cat="${c.id}" />
+        <span class="catlabel">${c.icon} ${categoryDisplayName(c)}</span>
+        <input type="number" min="0" step="100" placeholder="${tr("not_set")}" value="${state.budgets[c.id] ?? ''}" data-budget-cat="${c.id}" />
       </div>
     `).join("");
     return `
@@ -3131,7 +3211,7 @@ function renderSettings(){
       ${rows}
       <label class="exclude-toggle">
         <input type="checkbox" id="excludeToggle" ${state.excludeUnbudgeted ? 'checked' : ''} />
-        <span>予算未設定のカテゴリーの支出を、予算合計の消化状況に含めない</span>
+        <span>${tr("exclude_unbudgeted")}</span>
       </label>
     `;
   }
@@ -3139,14 +3219,14 @@ function renderSettings(){
   if(state.settingsSubTab === "fixed"){
     const catsForFcType = state.categories.filter(c=>c.type===state.fcType);
     const listHtml = state.fixedCosts.length === 0
-      ? `<div class="empty">固定費はまだ登録されていません</div>`
+      ? `<div class="empty">${tr("no_fixed_costs")}</div>`
       : state.fixedCosts.map(fc=>{
           const c = catOf(fc.categoryId);
           return `
             <div class="fixed-item">
               <div class="info">
-                <div class="name">${c.icon} ${c.name} ${fc.memo ? '・' + fc.memo : ''}</div>
-                <div class="meta">毎月${fc.day}日${fc.endDate ? ' 〜 ' + fc.endDate + 'まで' : ''}</div>
+                <div class="name">${c.icon} ${categoryDisplayName(c)} ${fc.memo ? '・' + fc.memo : ''}</div>
+                <div class="meta">${state.language==="en" ? `Every month on day ${fc.day}${fc.endDate ? ' until ' + fc.endDate : ''}` : `毎月${fc.day}日${fc.endDate ? ' 〜 ' + fc.endDate + 'まで' : ''}`}</div>
               </div>
               <span class="amt" style="color:${fc.type==='income'?TOKENS.moss:TOKENS.bengara}">${fc.type==='income'?'+':'-'}${yen(fc.amount)}</span>
               <button class="del-btn" data-del-fixed="${fc.id}">✕</button>
@@ -3159,41 +3239,41 @@ function renderSettings(){
       <div class="fixed-form">
         <div class="row">
           <div class="field">
-            <label>種別</label>
+            <label>${tr("fc_type")}</label>
             <select id="fcType">
-              <option value="expense" ${state.fcType==='expense'?'selected':''}>支出</option>
-              <option value="income" ${state.fcType==='income'?'selected':''}>収入</option>
+              <option value="expense" ${state.fcType==='expense'?'selected':''}>${tr("expense")}</option>
+              <option value="income" ${state.fcType==='income'?'selected':''}>${tr("income")}</option>
             </select>
           </div>
           <div class="field">
-            <label>カテゴリ</label>
+            <label>${tr("fc_category")}</label>
             <select id="fcCat">
-              ${catsForFcType.map(c=>`<option value="${c.id}" ${state.fcCat===c.id?'selected':''}>${c.icon} ${c.name}</option>`).join("")}
+              ${catsForFcType.map(c=>`<option value="${c.id}" ${state.fcCat===c.id?'selected':''}>${c.icon} ${categoryDisplayName(c)}</option>`).join("")}
             </select>
           </div>
         </div>
         <div class="row">
           <div class="field">
-            <label>金額（円）</label>
-            <input type="number" min="0" id="fcAmount" placeholder="例）68000" value="${state.fcAmount}" />
+            <label>${tr("fc_amount")}</label>
+            <input type="number" min="0" id="fcAmount" placeholder="e.g. 68000" value="${state.fcAmount}" />
           </div>
           <div class="field">
-            <label>毎月の日にち</label>
+            <label>${tr("fc_day")}</label>
             <select id="fcDay">
-              ${Array.from({length:28},(_,i)=>i+1).map(d=>`<option value="${d}" ${Number(state.fcDay)===d?'selected':''}>${d}日</option>`).join("")}
+              ${Array.from({length:28},(_,i)=>i+1).map(d=>`<option value="${d}" ${Number(state.fcDay)===d?'selected':''}>${d}${tr("day_unit")}</option>`).join("")}
             </select>
           </div>
         </div>
         <div class="row">
           <div class="field">
-            <label>終了日（任意）</label>
+            <label>${tr("fc_enddate")}</label>
             <div class="fc-enddate-row">
-              <button type="button" class="fc-enddate-btn" id="fcEndDateBtn">${state.fcEndDate ? state.fcEndDate : '指定しない'}</button>
+              <button type="button" class="fc-enddate-btn" id="fcEndDateBtn">${state.fcEndDate ? state.fcEndDate : tr("fc_no_enddate")}</button>
               ${state.fcEndDate ? `<button type="button" class="fc-enddate-clear" id="fcEndDateClearBtn">✕</button>` : ''}
             </div>
           </div>
         </div>
-        <button class="add-btn" id="addFixedBtn">固定費を追加</button>
+        <button class="add-btn" id="addFixedBtn">${tr("fc_add_btn")}</button>
       </div>
       <div class="fixed-list">${listHtml}</div>
     `;
@@ -3204,11 +3284,11 @@ function renderSettings(){
       ${sub}
       <label class="exclude-toggle">
         <input type="checkbox" id="showDiningToggle" ${state.showDiningStat ? 'checked' : ''} />
-        <span>外食回数カウントを表示する（レポートの表示・入力時の外食/自炊の選択、両方に反映されます）</span>
+        <span>${tr("show_dining_toggle")}</span>
       </label>
       <label class="exclude-toggle">
         <input type="checkbox" id="showBentoToggle" ${state.showBentoOption ? 'checked' : ''} />
-        <span>「弁当」の選択肢を追加する（外食／自炊に加えて選べるようになります）</span>
+        <span>${tr("show_bento_toggle")}</span>
       </label>
 
       <div class="report-title" style="margin-top:6px;">${tr("font_title")}</div>
@@ -3249,7 +3329,7 @@ function renderSettings(){
           return `
             <button class="frame-option-item ${active?'active':''}" data-frame="${key}">
               <div class="frame-option-preview">${previewHtml}</div>
-              <span class="frame-option-label">${opt.label}</span>
+              <span class="frame-option-label">${state.language==="en" ? opt.labelEn : opt.label}</span>
               ${active ? '<span class="frame-option-check">✓</span>' : ''}
             </button>
           `;
@@ -3262,17 +3342,19 @@ function renderSettings(){
     return `
       ${sub}
       <div style="padding:0 16px 12px;">
-        <button class="cat-new-btn" id="catNewBtn2">＋ 新規カテゴリー</button>
+        <button class="cat-new-btn" id="catNewBtn2">${tr("new_category")}</button>
         <div class="cat-select-bar">
-          <button class="cat-select-toggle ${state.catSelectMode?'on':''}" id="catSelectModeToggle">${state.catSelectMode ? '完了' : '編集'}</button>
-          ${state.catSelectMode ? `<button class="cat-delete-selected-btn" id="catDeleteSelectedBtn" ${state.catSelectedIds.length===0?'disabled':''}>${state.catSelectedIds.length}件を削除</button>` : ''}
+          <button class="cat-select-toggle ${state.catSelectMode?'on':''}" id="catSelectModeToggle">${state.catSelectMode ? tr("cat_done") : tr("cat_edit")}</button>
+          ${state.catSelectMode ? `<button class="cat-delete-selected-btn" id="catDeleteSelectedBtn" ${state.catSelectedIds.length===0?'disabled':''}>${state.language==="en" ? `Delete (${state.catSelectedIds.length})` : `${state.catSelectedIds.length}件を削除`}</button>` : ''}
         </div>
         ${state.catDeleteConfirm ? `
           <div class="cat-delete-confirm">
-            <p>選択した${state.catSelectedIds.length}件のジャンルを削除しますか？<br>関連する記録・固定費は「その他」に振り替わります。</p>
+            <p>${state.language==="en"
+              ? `Delete the ${state.catSelectedIds.length} selected categories?<br>Related records and fixed costs will be moved to "Other".`
+              : `選択した${state.catSelectedIds.length}件のジャンルを削除しますか？<br>関連する記録・固定費は「その他」に振り替わります。`}</p>
             <div class="row">
-              <button class="btn-confirm" id="catDeleteConfirmBtn">削除する</button>
-              <button class="btn-cancel" id="catDeleteCancelBtn">キャンセル</button>
+              <button class="btn-confirm" id="catDeleteConfirmBtn">${tr("delete_btn")}</button>
+              <button class="btn-cancel" id="catDeleteCancelBtn">${tr("cancel")}</button>
             </div>
           </div>
         ` : ""}
@@ -3283,7 +3365,7 @@ function renderSettings(){
 
   if(state.settingsSubTab === "stamps"){
     const stampListHtml = state.stamps.length===0
-      ? `<div class="empty">まだ烙印がありません</div>`
+      ? `<div class="empty">${tr("no_stamps_yet")}</div>`
       : state.stamps.map(s=>`
           <div class="cat-list-item">
             <span class="swatch" style="background:${s.color}"></span>
@@ -3295,17 +3377,17 @@ function renderSettings(){
     return `
       ${sub}
       <div style="padding:0 16px 12px;">
-        <button class="cat-new-btn" id="stampNewBtn">＋ 新規烙印を追加</button>
+        <button class="cat-new-btn" id="stampNewBtn">${tr("new_stamp")}</button>
         ${state.stampAddOpen ? `
           <div class="cat-add-form">
             <div class="row">
               <input type="text" class="icon-input" id="newStampIcon" maxlength="2" value="${state.newStampIcon}" />
-              <input type="text" class="name-input" id="newStampName" placeholder="例）自分へのご褒美、プレゼント用、等々" value="${state.newStampName}" />
+              <input type="text" class="name-input" id="newStampName" placeholder="${tr("stamp_name_placeholder")}" value="${state.newStampName}" />
             </div>
             <div class="swatches">
               ${COLOR_PRESETS.map(col=>`<button class="swatch-btn ${state.newStampColor===col?'selected':''}" data-stampswatch="${col}" style="background:${col}"></button>`).join("")}
             </div>
-            <button class="add-btn" id="addStampBtn">烙印を追加</button>
+            <button class="add-btn" id="addStampBtn">${tr("add_stamp_btn")}</button>
           </div>
         ` : ""}
       </div>
@@ -3325,7 +3407,7 @@ function renderSettings(){
       <div class="cat-list-item editing-cat" data-cat-id="${c.id}" data-cat-type="${c.type}">
         <input type="text" class="cat-edit-icon" id="catEditIcon" maxlength="2" value="${state.editCatIcon}" />
         <input type="text" class="cat-edit-name" id="catEditName" value="${state.editCatName}" />
-        <button class="cat-edit-save" data-cat-save="${c.id}">保存</button>
+        <button class="cat-edit-save" data-cat-save="${c.id}">${tr("save_btn2")}</button>
         <button class="cat-edit-cancel" data-cat-cancel="${c.id}">✕</button>
       </div>
     `;
@@ -3335,9 +3417,9 @@ function renderSettings(){
     <div class="cat-list-item ${state.catSelectMode?'selectable':''} ${isSelected?'selected':''}" ${clickAttr} data-cat-id="${c.id}" data-cat-type="${c.type}">
       ${state.catSelectMode ? `<span class="cat-checkbox ${isSelected?'checked':''}">${isSelected?'✓':''}</span>` : ''}
       <span class="swatch" style="background:${c.color}"></span>
-      <span class="nm" ${!state.catSelectMode ? `data-cat-edit-open="${c.id}"` : ''}>${c.icon} ${c.name}
-        <span class="type-tag ${c.type}">${c.type==='income'?'収入':'支出'}</span>
-        ${c.diningOutEnabled ? '<span class="dine-tag">外食チェック</span>' : ''}
+      <span class="nm" ${!state.catSelectMode ? `data-cat-edit-open="${c.id}"` : ''}>${c.icon} ${categoryDisplayName(c)}
+        <span class="type-tag ${c.type}">${c.type==='income'?tr("income"):tr("expense")}</span>
+        ${c.diningOutEnabled ? `<span class="dine-tag">${tr("dine_check_tag")}</span>` : ''}
       </span>
       ${!state.catSelectMode ? `
         <span class="cat-drag-handle" data-cat-drag="${c.id}">⠿</span>
@@ -3349,17 +3431,19 @@ function renderSettings(){
 
   const selectBarHtml = `
     <div class="cat-select-bar">
-      <button class="cat-select-toggle ${state.catSelectMode?'on':''}" id="catSelectModeToggle">${state.catSelectMode ? 'キャンセル' : '選択して削除'}</button>
-      ${state.catSelectMode ? `<button class="cat-delete-selected-btn" id="catDeleteSelectedBtn" ${state.catSelectedIds.length===0?'disabled':''}>${state.catSelectedIds.length}件を削除</button>` : ''}
+      <button class="cat-select-toggle ${state.catSelectMode?'on':''}" id="catSelectModeToggle">${state.catSelectMode ? tr("cancel") : tr("cat_edit")}</button>
+      ${state.catSelectMode ? `<button class="cat-delete-selected-btn" id="catDeleteSelectedBtn" ${state.catSelectedIds.length===0?'disabled':''}>${state.language==="en" ? `Delete (${state.catSelectedIds.length})` : `${state.catSelectedIds.length}件を削除`}</button>` : ''}
     </div>
   `;
 
   const confirmHtml = state.catDeleteConfirm ? `
     <div class="cat-delete-confirm">
-      <p>選択した${state.catSelectedIds.length}件のジャンルを削除しますか？<br>関連する記録・固定費は「その他」に振り替わります。</p>
+      <p>${state.language==="en"
+        ? `Delete the ${state.catSelectedIds.length} selected categories?<br>Related records and fixed costs will be moved to "Other".`
+        : `選択した${state.catSelectedIds.length}件のジャンルを削除しますか？<br>関連する記録・固定費は「その他」に振り替わります。`}</p>
       <div class="row">
-        <button class="btn-confirm" id="catDeleteConfirmBtn">削除する</button>
-        <button class="btn-cancel" id="catDeleteCancelBtn">キャンセル</button>
+        <button class="btn-confirm" id="catDeleteConfirmBtn">${tr("delete_btn")}</button>
+        <button class="btn-cancel" id="catDeleteCancelBtn">${tr("cancel")}</button>
       </div>
     </div>
   ` : "";
@@ -3370,23 +3454,23 @@ function renderSettings(){
     ${confirmHtml}
     <div class="cat-list">${catListHtml}</div>
     <div class="cat-add-form">
-      <div class="report-title" style="padding:0; margin-bottom:10px;">新しいカテゴリを追加</div>
+      <div class="report-title" style="padding:0; margin-bottom:10px;">${tr("new_cat_title")}</div>
       <div class="switch" style="margin-bottom:10px;">
-        <button data-newcattype="expense" class="${state.newCatType==='expense'?'active':''}">支出</button>
-        <button data-newcattype="income" class="${state.newCatType==='income'?'active':''}">収入</button>
+        <button data-newcattype="expense" class="${state.newCatType==='expense'?'active':''}">${tr("expense")}</button>
+        <button data-newcattype="income" class="${state.newCatType==='income'?'active':''}">${tr("income")}</button>
       </div>
       <div class="row">
-        <input type="text" class="icon-input" id="newCatIcon" maxlength="2" placeholder="絵文字" value="${state.newCatIcon}" />
-        <input type="text" class="name-input" id="newCatName" placeholder="カテゴリ名" value="${state.newCatName}" />
+        <input type="text" class="icon-input" id="newCatIcon" maxlength="2" placeholder="${tr("icon_placeholder")}" value="${state.newCatIcon}" />
+        <input type="text" class="name-input" id="newCatName" placeholder="${tr("cat_name_placeholder")}" value="${state.newCatName}" />
       </div>
       <div class="swatches">
         ${COLOR_PRESETS.map(col=>`<button class="swatch-btn ${state.newCatColor===col?'selected':''}" data-swatch="${col}" style="background:${col}"></button>`).join("")}
       </div>
       <label class="dine-check">
         <input type="checkbox" id="newCatDining" ${state.newCatDining?'checked':''} />
-        <span>選択時に「外食 ・ 弁当」を選べるようにする（食費用の項目に）</span>
+        <span>${tr("dine_check_label")}</span>
       </label>
-      <button class="add-btn" id="addCatBtn">カテゴリを追加</button>
+      <button class="add-btn" id="addCatBtn">${tr("add")}</button>
     </div>
   `;
 }
@@ -3840,7 +3924,7 @@ function attachHandlers(){
           const provider = new firebase.auth.GoogleAuthProvider();
           fbAuth.signInWithPopup(provider).catch(e=>{
             console.warn("ログインに失敗しました", e);
-            alert("ログインに失敗しました。もう一度お試しください。");
+            alert(tr("login_failed"));
           });
         };
       }
@@ -3884,10 +3968,10 @@ function attachHandlers(){
             .catch(e=>{
               console.warn("アカウント削除に失敗しました", e);
               if(e && e.code === "auth/requires-recent-login"){
-                alert("セキュリティのため、アカウント削除には再ログインが必要です。一度ログアウトしますので、再度ログインしてからもう一度お試しください（記録データはすでに削除されています）。");
+                alert(tr("account_delete_reauth"));
                 fbAuth.signOut();
               } else {
-                alert("アカウント削除中にエラーが発生しました。もう一度お試しください。");
+                alert(tr("account_delete_error"));
               }
             })
             .finally(()=>{
@@ -3929,7 +4013,7 @@ function attachHandlers(){
             exportTransactionsCSV();
           }catch(e){
             console.warn("CSV書き出しに失敗しました", e);
-            alert("CSVの書き出しに失敗しました。もう一度お試しください。");
+            alert(tr("csv_export_error"));
           }
         };
       }
