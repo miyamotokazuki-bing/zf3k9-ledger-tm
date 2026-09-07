@@ -641,10 +641,11 @@
   .edit-field-row select{ flex:1.3; }
   .edit-field-row input[type="number"]{ flex:1; text-align:right; }
   .edit-photo-row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-  .edit-photo-row img{ width:56px; height:56px; object-fit:cover; border-radius:6px; }
+  .edit-photo-row img{ width:56px; height:56px; object-fit:cover; border-radius:8px; }
   .edit-photo-row .edit-photo-btn{
-    font-size:11px; padding:6px 10px; border-radius:8px; border:1px solid var(--line);
-    background:white; color:var(--ink60); cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:12.5px; font-weight:600; padding:10px 14px; border-radius:10px; border:1px solid var(--line);
+    background:var(--cream); color:var(--ink); cursor:pointer;
   }
   textarea.edit-comment{
     width:100%; resize:none; min-height:56px; border:1px solid var(--line); border-radius:8px;
@@ -679,6 +680,14 @@
     font-size:13px; color:var(--ink); line-height:1.85; margin:0 0 12px;
   }
   .intro-tips{ margin:0; padding-left:20px; }
+  .intro-step{ display:flex; gap:12px; margin-bottom:16px; }
+  .intro-step .num{
+    flex:0 0 auto; width:26px; height:26px; border-radius:50%; background:var(--bengara);
+    color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center;
+  }
+  .intro-step .body{ flex:1; }
+  .intro-step .step-title{ font-size:13.5px; font-weight:700; color:var(--ink); margin-bottom:3px; }
+  .intro-step .step-desc{ font-size:12.5px; color:var(--ink60); line-height:1.7; }
   .intro-tips li{ font-size:13px; color:var(--ink); line-height:1.85; margin-bottom:8px; }
   .intro-start-btn{
     width:100%; padding:15px 0; border-radius:12px; border:none; background:var(--ink);
@@ -2274,17 +2283,34 @@ function introBodyHtml(){
     `;
   }
   return `
-    <div class="intro-section-title">作者からのコメント</div>
+    <div class="intro-section-title">ダウンロードありがとうございます</div>
     <p class="intro-text">
-      支払いは思い出タイムラインとして残っていくので、写真や購入品の説明も一緒に残しておくと、後から見返すのがより楽しくなります。
+      よくある家計簿って、記録するモチベーションが湧かないし、支出を振り返る機会もないですよね……。このアプリでは自分の買い物がタイムラインに残るので、楽しくて長続きします！
     </p>
-    <p class="intro-text">
-      「要らなかったもの」などと名付けた烙印を、振り返りのスクロールがてら押してみてください。
+    <p class="intro-text" style="margin-bottom:16px;">
+      使い方はとてもシンプルです。
     </p>
-    <p class="intro-text">
-      烙印ごとの件数と合計金額はレポートタブでいつでも確認できるので、自分のお金の使い道を簡単に見直せます。<br>
-      （もちろん、付ける烙印次第で、反省だけでなく楽しい思い出を振り返ることもできます）
-    </p>
+    <div class="intro-step">
+      <span class="num">1</span>
+      <div class="body">
+        <div class="step-title">記録する</div>
+        <div class="step-desc">金額とカテゴリを選ぶだけ。写真やひとことも一緒に残せます。</div>
+      </div>
+    </div>
+    <div class="intro-step">
+      <span class="num">2</span>
+      <div class="body">
+        <div class="step-title">タイムラインで振り返る</div>
+        <div class="step-desc">記録がそのまま「思い出」として並びます。あとから見返すのが楽しくなります。</div>
+      </div>
+    </div>
+    <div class="intro-step">
+      <span class="num">3</span>
+      <div class="body">
+        <div class="step-title">烙印で仕分ける</div>
+        <div class="step-desc">「要らなかったもの」のように自分だけのタグを付けて、レポートでまとめて確認。お金の使い方が自然と見えてきます。</div>
+      </div>
+    </div>
     <div class="intro-section-title">Tips</div>
     <ul class="intro-tips">
       <li>「０円」のところをタッチしても電卓が開けます。</li>
@@ -2313,6 +2339,15 @@ const FONT_OPTIONS = {
   emberly: { label: "Emberly", labelEn: "Emberly", serif:"'Emberly', serif", sans:"'Emberly', serif", langs:["en"] },
 };
 
+function applyStatusBarTheme(){
+  const isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+  const StatusBarPlugin = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar;
+  if(!isNative || !StatusBarPlugin) return;
+  const bgColor = state.darkMode ? "#20303E" : "#F2E9DA";
+  const styleValue = state.darkMode ? "DARK" : "LIGHT";
+  if(StatusBarPlugin.setBackgroundColor) StatusBarPlugin.setBackgroundColor({ color: bgColor }).catch(()=>{});
+  if(StatusBarPlugin.setStyle) StatusBarPlugin.setStyle({ style: styleValue }).catch(()=>{});
+}
 function applySelectedFont(){
   const lang = state.language || "ja";
   const currentOpt = FONT_OPTIONS[state.selectedFont];
@@ -2326,6 +2361,7 @@ function applySelectedFont(){
 function render(){
   applySelectedFont();
   document.documentElement.classList.toggle("dark-mode", !!state.darkMode);
+  applyStatusBarTheme();
   const c = document.getElementById("content");
   const navEl = document.getElementById("nav");
 
@@ -3152,10 +3188,9 @@ function renderMemory(){
                 <input type="number" min="0" data-edit-amount value="${draft.amount}" />
               </div>
               <div class="edit-photo-row">
-                <input type="file" accept="image/*" id="editPhotoInput" style="display:none" />
                 ${draft.photo
-                  ? `<img src="${draft.photo}" /><button class="edit-photo-btn" data-edit-photo-remove>${tr("remove_photo")}</button>`
-                  : `<button class="edit-photo-btn" data-edit-photo-add>${tr("add_photo")}</button>`
+                  ? `<img src="${draft.photo}" /><button class="edit-photo-btn" data-edit-photo-remove>🗑 ${tr("remove_photo")}</button>`
+                  : `<button class="edit-photo-btn" data-edit-photo-add>🖼 ${tr("add_photo")}</button>`
                 }
               </div>
               <textarea class="edit-comment" data-edit-comment placeholder="${tr("memo_placeholder")}">${draft.comment}</textarea>
