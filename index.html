@@ -334,6 +334,23 @@
   }
   .calc-backdrop.open{ opacity:1; pointer-events:auto; }
 
+  .photo-source-overlay{
+    position:absolute; inset:0; background:rgba(27,42,56,0.45);
+    display:flex; align-items:flex-end; justify-content:center; z-index:60;
+  }
+  .photo-source-sheet{
+    width:100%; background:var(--cream); border-top:2px solid var(--ink);
+    border-radius:22px 22px 0 0; padding:14px 16px calc(16px + env(safe-area-inset-bottom));
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .photo-source-sheet button{
+    padding:15px 0; border-radius:14px; border:1px solid var(--line);
+    background:var(--paper); color:var(--ink); font-size:15px; font-weight:600; cursor:pointer;
+  }
+  .photo-source-sheet button.cancel{
+    background:transparent; border:none; color:var(--ink60); font-weight:700; margin-top:2px;
+  }
+
   .calc-sheet{
     position:absolute; left:0; right:0; bottom:0; height:52%;
     background:var(--cream); border-top:2px solid var(--ink); border-radius:22px 22px 0 0;
@@ -1827,18 +1844,53 @@ function renderDayLogSheet(){
     sheet.innerHTML = "";
   }
 }
+function webPathToDataUrl(webPath){
+  return fetch(webPath)
+    .then(res=>res.blob())
+    .then(blob=>new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onload = ()=> resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    }));
+}
+function showPhotoSourceChoice(onChoice){
+  const overlay = document.createElement("div");
+  overlay.className = "photo-source-overlay";
+  overlay.innerHTML = `
+    <div class="photo-source-sheet">
+      <button data-choice="camera">📷 ${state.language==="en" ? "Take Photo" : "カメラで撮る"}</button>
+      <button data-choice="gallery">🖼 ${state.language==="en" ? "Choose from Library" : "アルバムから選ぶ"}</button>
+      <button data-choice="cancel" class="cancel">${tr("cancel")}</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener("click", (e)=>{
+    const btn = e.target.closest("[data-choice]");
+    if(!btn && e.target !== overlay) return;
+    const choice = btn ? btn.dataset.choice : "cancel";
+    document.body.removeChild(overlay);
+    if(choice !== "cancel") onChoice(choice);
+  });
+}
 function pickPhoto(onPicked){
   const isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
   const CameraPlugin = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Camera;
   if(isNative && CameraPlugin){
-    CameraPlugin.getPhoto({
-      resultType: "dataUrl",
-      source: "PROMPT",
-      quality: 70,
-      allowEditing: false
-    }).then(photo=>{
-      if(photo && photo.dataUrl) onPicked(photo.dataUrl);
-    }).catch(()=>{ /* ユーザーがキャンセルした場合は何もしない */ });
+    showPhotoSourceChoice((choice)=>{
+      const task = choice === "camera"
+        ? CameraPlugin.takePhoto({ quality: 70 })
+        : CameraPlugin.chooseFromGallery({ quality: 70 });
+      task.then(result=>{
+        const media = result && result.results ? result.results[0] : result;
+        if(media && media.webPath) return webPathToDataUrl(media.webPath);
+        throw new Error("no webPath");
+      }).then(dataUrl=>{
+        if(dataUrl) onPicked(dataUrl);
+      }).catch(err=>{
+        console.warn("写真の取得に失敗しました", err);
+      });
+    });
     return;
   }
   const fallbackInput = document.createElement("input");
