@@ -321,6 +321,42 @@
     z-index:20; display:flex; flex-direction:column; padding:10px 16px 16px;
   }
   .calc-sheet.open{ transform:translateY(0); }
+  .daylog-sheet{
+    position:absolute; left:0; right:0; bottom:0; height:78%;
+    background:var(--cream); border-top:2px solid var(--ink); border-radius:22px 22px 0 0;
+    box-shadow:0 -10px 28px rgba(0,0,0,0.28);
+    transform:translateY(100%); transition:transform .3s cubic-bezier(.32,.72,0,1);
+    z-index:20; display:flex; flex-direction:column; padding:10px 16px 16px;
+    overflow-y:auto;
+  }
+  .daylog-sheet.open{ transform:translateY(0); }
+  .daylog-title{
+    font-family:var(--font-serif); font-size:16px; font-weight:700; color:var(--ink);
+    text-align:center; margin:2px 0 14px;
+  }
+
+  .graphcal-toggle{ display:flex; gap:8px; padding:0 16px 4px; }
+  .graphcal-toggle button{
+    flex:1; padding:12px 4px; border-radius:12px; border:1px solid var(--line);
+    background:var(--cream); color:var(--ink); font-size:13px; font-weight:700; cursor:pointer;
+  }
+  .graphcal-toggle button.active{ background:var(--ink); color:var(--cream); border-color:var(--ink); }
+
+  .cal-grid{ padding:8px 16px 4px; }
+  .cal-weekday-row{ display:grid; grid-template-columns:repeat(7,1fr); margin-bottom:6px; }
+  .cal-weekday-row span{ text-align:center; font-size:11px; color:var(--ink40); font-weight:600; }
+  .cal-day-row{ display:grid; grid-template-columns:repeat(7,1fr); }
+  .cal-day-cell{
+    aspect-ratio:1/0.82; display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    padding-top:6px; border-radius:10px; cursor:pointer; gap:2px;
+  }
+  .cal-day-cell.empty{ cursor:default; }
+  .cal-day-cell.selected{ background:var(--paperDeep); }
+  .cal-day-cell .num{ font-size:13px; font-weight:600; color:var(--ink); }
+  .cal-day-cell.today .num{ color:var(--moss); font-weight:800; }
+  .cal-day-cell .amt{ font-size:10.5px; font-weight:700; line-height:1.1; }
+  .cal-day-cell .amt.income{ color:#4A6C8C; }
+  .cal-day-cell .amt.expense{ color:var(--bengara); }
   .calc-sheet-handle{
     width:36px; height:4px; border-radius:999px; background:var(--line); margin:4px auto 12px;
   }
@@ -1373,6 +1409,8 @@
   <div class="frame-preview-screen" id="tipsScreen"></div>
   <div class="calc-backdrop" id="calcBackdrop"></div>
   <div class="calc-sheet" id="calcSheet"></div>
+  <div class="calc-backdrop" id="dayLogBackdrop"></div>
+  <div class="daylog-sheet" id="dayLogSheet"></div>
   <div class="calc-backdrop" id="datePickerBackdrop"></div>
   <div class="calc-sheet" id="datePickerSheet"></div>
   <div class="calc-backdrop cat-manage-backdrop" id="catManageBackdrop"></div>
@@ -1434,6 +1472,7 @@ const TRANSLATIONS = {
     week_income: "週の収入", week_expense: "週の支出", no_budget_cats: "設定タブから予算を登録できます",
     no_data: "データなし", no_matching_records: "この期間には該当する記録がありません", no_memories_yet: "この期間にはまだ思い出がありません",
     stamps_applied_label: "押された焼印：",
+    graph_label: "グラフ", calendar_label: "カレンダー",
     fc_type: "種別", fc_category: "カテゴリ", fc_amount: "金額（円）", fc_day: "毎月の日にち",
     fc_enddate: "終了日（任意）", fc_no_enddate: "指定しない", fc_add_btn: "固定費を追加", day_unit: "日",
     cat_edit: "編集", cat_done: "完了",
@@ -1496,6 +1535,7 @@ const TRANSLATIONS = {
     week_income: "Income this week", week_expense: "Expense this week", no_budget_cats: "You can set budgets from the Settings tab",
     no_data: "No data", no_matching_records: "No records for this period", no_memories_yet: "No memories yet for this period",
     stamps_applied_label: "Stamps applied:",
+    graph_label: "Graph", calendar_label: "Calendar",
     fc_type: "Type", fc_category: "Category", fc_amount: "Amount (yen)", fc_day: "Day of month",
     fc_enddate: "End date (optional)", fc_no_enddate: "None", fc_add_btn: "Add fixed cost", day_unit: "",
     cat_edit: "Edit", cat_done: "Done",
@@ -1644,6 +1684,75 @@ function formatYearMonth(year, month, yearOnly){
 function memoriesLabel(dateLabel){
   return state.language === "en" ? `${dateLabel} Memories` : `${dateLabel}の思い出`;
 }
+function buildCalendarHtml(year, month){
+  const dim = daysInMonthOf(year, month);
+  const firstWeekday = new Date(year, month, 1).getDay();
+  const weekdayLabels = state.language==="en" ? ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"] : ["日","月","火","水","木","金","土"];
+  const monthKey = `${year}-${String(month+1).padStart(2,'0')}`;
+  const dayTotals = {};
+  state.transactions.forEach(t=>{
+    if(!t.date.startsWith(monthKey) || t.isExample) return;
+    const d = Number(t.date.split('-')[2]);
+    if(!dayTotals[d]) dayTotals[d] = {income:0, expense:0};
+    if(t.type==="income") dayTotals[d].income += t.amount;
+    else dayTotals[d].expense += t.amount;
+  });
+  if(!state.calendarSelectedDate) state.calendarSelectedDate = TODAY;
+  const selectedDate = state.calendarSelectedDate;
+
+  const cells = [];
+  for(let i=0;i<firstWeekday;i++) cells.push(`<div class="cal-day-cell empty"></div>`);
+  for(let d=1; d<=dim; d++){
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const totals = dayTotals[d];
+    let amtHtml = "";
+    if(totals){
+      const net = totals.income - totals.expense;
+      if(net > 0) amtHtml = `<span class="amt income">${net.toLocaleString('ja-JP')}</span>`;
+      else if(net < 0) amtHtml = `<span class="amt expense">-${Math.abs(net).toLocaleString('ja-JP')}</span>`;
+    }
+    const isSelected = dateStr === selectedDate;
+    const isToday = dateStr === TODAY;
+    cells.push(`
+      <div class="cal-day-cell ${isSelected?'selected':''} ${isToday?'today':''}" data-cal-date="${dateStr}">
+        <span class="num">${d}</span>
+        ${amtHtml}
+      </div>
+    `);
+  }
+  let rows = "";
+  for(let i=0;i<cells.length;i+=7){
+    rows += `<div class="cal-day-row">${cells.slice(i,i+7).join("")}</div>`;
+  }
+  return `
+    <div class="cal-grid">
+      <div class="cal-weekday-row">${weekdayLabels.map(w=>`<span>${w}</span>`).join("")}</div>
+      ${rows}
+    </div>
+  `;
+}
+function renderDayLogSheet(){
+  const sheet = document.getElementById("dayLogSheet");
+  const backdrop = document.getElementById("dayLogBackdrop");
+  if(!sheet || !backdrop) return;
+  if(state.dayLogOpen && state.dayLogDate){
+    sheet.classList.add("open");
+    backdrop.classList.add("open");
+    const dayTx = state.transactions.filter(t=>t.date===state.dayLogDate && !t.isExample);
+    const cardsHtml = buildSimpleMemoryCards(dayTx);
+    const [y,m,d] = state.dayLogDate.split('-').map(Number);
+    const dateLabel = state.language==="en" ? `${MONTH_NAMES_EN[m-1]} ${d}, ${y}` : `${y}年${m}月${d}日`;
+    sheet.innerHTML = `
+      <div class="calc-sheet-handle"></div>
+      <div class="daylog-title">${memoriesLabel(dateLabel)}</div>
+      ${cardsHtml}
+    `;
+  } else {
+    sheet.classList.remove("open");
+    backdrop.classList.remove("open");
+    sheet.innerHTML = "";
+  }
+}
 function stampDisplayName(stamp){
   if(!stamp) return "";
   if(stamp.id === "not_needed" || stamp.name === "要らなかったもの") return tr("stamp_not_needed");
@@ -1715,6 +1824,10 @@ let state = {
   editingDraft: { comment:"", amount:"", categoryId:"", photo:null },
   reportCatView: "expense",
   reportCatOpen: false,
+  calendarOpen: false,
+  calendarSelectedDate: null,
+  dayLogOpen: false,
+  dayLogDate: null,
 
   stamps: JSON.parse(JSON.stringify(DEFAULT_STAMPS)),
   reflectionMode: false,
@@ -2095,6 +2208,7 @@ function render(){
   renderCatAddSheet();
   renderFramePreview();
   renderTipsScreen();
+  renderDayLogSheet();
 
   const stampActive = state.tab === "memory" && state.reflectionMode;
   const stampScreenFrame = document.getElementById("stampScreenFrame");
@@ -2673,9 +2787,9 @@ function renderReport(){
           <span class="d-item">🏠 ${tr("self_cook")} ${state.language==="en"?"×":""}<b class="d-green">${selfCookCount}</b>${state.language==="en"?"":tr("times_unit")}</span>
         </div>` : ''}
       </div>
-      <div class="report-title collapsible" data-toggle-catsection>
-        <span>${tr("category_breakdown")}</span>
-        <span class="chev ${state.reportCatOpen?'open':''}">▶</span>
+      <div class="graphcal-toggle">
+        <button class="${state.reportCatOpen?'active':''}" data-toggle-graph>${tr("graph_label")}</button>
+        <button class="${state.calendarOpen?'active':''}" data-toggle-calendar>${tr("calendar_label")}</button>
       </div>
       ${state.reportCatOpen ? `
         <div class="cat-swipe-wrap">
@@ -2720,6 +2834,7 @@ function renderReport(){
           <span class="hint">${tr("swipe_hint")}</span>
         </div>
       ` : ''}
+      ${state.calendarOpen ? buildCalendarHtml(year, month) : ''}
 
       ${state.reportSectionSwapped ? stampSectionHtml + budgetSectionHtml : budgetSectionHtml + stampSectionHtml}
     </div>
@@ -3676,10 +3791,31 @@ function attachHandlers(){
       render();
     };
 
-    const toggleCatSection = document.querySelector("[data-toggle-catsection]");
-    if(toggleCatSection){
-      toggleCatSection.onclick = ()=>{ state.reportCatOpen = !state.reportCatOpen; render(); };
+    const toggleGraphBtn = document.querySelector("[data-toggle-graph]");
+    if(toggleGraphBtn){
+      toggleGraphBtn.onclick = ()=>{
+        state.reportCatOpen = !state.reportCatOpen;
+        if(state.reportCatOpen) state.calendarOpen = false;
+        render();
+      };
     }
+    const toggleCalendarBtn = document.querySelector("[data-toggle-calendar]");
+    if(toggleCalendarBtn){
+      toggleCalendarBtn.onclick = ()=>{
+        state.calendarOpen = !state.calendarOpen;
+        if(state.calendarOpen) state.reportCatOpen = false;
+        render();
+      };
+    }
+    document.querySelectorAll("[data-cal-date]").forEach(cell=>{
+      cell.onclick = ()=>{
+        const dateStr = cell.dataset.calDate;
+        state.calendarSelectedDate = dateStr;
+        state.dayLogDate = dateStr;
+        state.dayLogOpen = true;
+        render();
+      };
+    });
 
     document.querySelectorAll("[data-catview]").forEach(b=>{
       b.onclick = ()=>{ state.reportCatView = b.dataset.catview; render(); };
@@ -4640,6 +4776,10 @@ function attachHandlers(){
   const calcBackdrop = document.getElementById("calcBackdrop");
   if(calcBackdrop){
     calcBackdrop.onclick = ()=>{ if(state.calcOpen){ state.calcOpen = false; render(); } };
+  }
+  const dayLogBackdrop = document.getElementById("dayLogBackdrop");
+  if(dayLogBackdrop){
+    dayLogBackdrop.onclick = ()=>{ if(state.dayLogOpen){ state.dayLogOpen = false; render(); } };
   }
 
   // 日付ドラムピッカー
