@@ -1534,7 +1534,7 @@ const TRANSLATIONS = {
     delete_btn: "削除する",
     show_dining_toggle: "外食回数カウントを表示する（レポートの表示・入力時の外食/自炊の選択、両方に反映されます）",
     show_bento_toggle: "「弁当」の選択肢を追加する（外食／自炊に加えて選べるようになります）",
-    calendar_as_button_toggle: "カレンダーと予算の位置を入れ替える（カレンダーをボタン、予算を常時表示にします）",
+    calendar_as_button_toggle: "カレンダーと予算の位置を入れ替える（予算をボタン、カレンダーを常時表示にします）",
     dark_mode_toggle: "ダークモード",
     account_no_login_note: "現在はログインなしで、この端末だけにデータを保存しています。ログインすると、記録をクラウドに保存し、他の端末とも同期できるようになります。",
     google_signin: "Googleでログイン",
@@ -1601,7 +1601,7 @@ const TRANSLATIONS = {
     delete_btn: "Delete",
     show_dining_toggle: "Show eating-out count (reflected both in the report display and the eating-out/home-cooked choice on the Add tab)",
     show_bento_toggle: "Add a \"Bento\" option (selectable alongside eating out / home-cooked)",
-    calendar_as_button_toggle: "Swap Calendar and Budget positions (Calendar becomes a button, Budget stays always shown)",
+    calendar_as_button_toggle: "Swap Calendar and Budget positions (Budget becomes a button, Calendar stays always shown)",
     dark_mode_toggle: "Dark mode",
     account_no_login_note: "You're currently signed out, and data is saved only on this device. Sign in to save your records to the cloud and sync across devices.",
     google_signin: "Sign in with Google",
@@ -3557,7 +3557,7 @@ function renderSettings(){
         <span>${tr("show_bento_toggle")}</span>
       </label>
       <label class="exclude-toggle">
-        <input type="checkbox" id="calendarAsButtonToggle" ${state.calendarAsButton ? 'checked' : ''} />
+        <input type="checkbox" id="calendarAsButtonToggle" ${!state.calendarAsButton ? 'checked' : ''} />
         <span>${tr("calendar_as_button_toggle")}</span>
       </label>
       <label class="exclude-toggle">
@@ -4322,7 +4322,7 @@ function attachHandlers(){
       const calendarAsButtonToggle = document.getElementById("calendarAsButtonToggle");
       if(calendarAsButtonToggle){
         calendarAsButtonToggle.onchange = (e)=>{
-          state.calendarAsButton = e.target.checked;
+          state.calendarAsButton = !e.target.checked;
           state.reportBudgetOpen = false;
           render();
         };
