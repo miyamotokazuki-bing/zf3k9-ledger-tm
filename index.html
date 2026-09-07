@@ -34,6 +34,23 @@
     --font-serif:'Noto Sans JP', sans-serif;
     --font-sans:'Noto Sans JP', sans-serif;
   }
+  html.dark-mode{
+    --ink:#EDE6D8;
+    --paper:#20303E;
+    --paperDeep:#18242F;
+    --gold:#D9A857;
+    --bengara:#D6664C;
+    --moss:#8AA477;
+    --cream:#1A2733;
+    --line:#2E4152;
+    --ink60:rgba(237,230,216,0.6);
+    --ink40:rgba(237,230,216,0.38);
+    --neu-dark:rgba(0,0,0,0.55);
+    --neu-light:rgba(255,255,255,0.045);
+  }
+  html.dark-mode body{
+    background:linear-gradient(180deg,#0E161D 0%, #060A0E 100%);
+  }
   *{box-sizing:border-box;}
   button, input, textarea, select{ font-family:inherit; }
   body{
@@ -218,6 +235,10 @@
   }
   .amount-box .num.empty{ color:var(--ink40); }
   .amount-box .yen{ font-size:15px; color:var(--ink60); margin-left:4px; }
+  .amount-box .yen-prefix{
+    font-family:var(--font-serif); font-size:26px; color:var(--ink); font-weight:600;
+    margin-left:0; margin-right:4px; vertical-align:baseline;
+  }
 
   .cats{
     display:grid;
@@ -346,14 +367,14 @@
   }
   .lang-option-btn.active{ border-color:var(--bengara); background:#F4E7DF; color:var(--bengara); }
 
-  .graphcal-toggle{ display:flex; gap:14px; padding:0 16px 4px; }
+  .graphcal-toggle{ display:flex; gap:10px; padding:0 16px 4px; }
   .graphcal-toggle button{
     flex:1; padding:12px 4px; border-radius:12px; border:1px solid var(--line);
     background:var(--cream); color:var(--ink); font-size:13px; font-weight:700; cursor:pointer;
   }
   .graphcal-toggle button.active{ background:var(--ink); color:var(--cream); border-color:var(--ink); }
   .report-neu .graphcal-toggle{
-    background:transparent; padding:0; gap:14px;
+    background:transparent; padding:0; gap:10px;
   }
   .report-neu .graphcal-toggle button{
     border:none; background:var(--paper); border-radius:14px; color:var(--ink);
@@ -1514,6 +1535,7 @@ const TRANSLATIONS = {
     show_dining_toggle: "外食回数カウントを表示する（レポートの表示・入力時の外食/自炊の選択、両方に反映されます）",
     show_bento_toggle: "「弁当」の選択肢を追加する（外食／自炊に加えて選べるようになります）",
     calendar_as_button_toggle: "カレンダーと予算の位置を入れ替える（カレンダーをボタン、予算を常時表示にします）",
+    dark_mode_toggle: "ダークモード",
     account_no_login_note: "現在はログインなしで、この端末だけにデータを保存しています。ログインすると、記録をクラウドに保存し、他の端末とも同期できるようになります。",
     google_signin: "Googleでログイン",
     account_delete_confirm: "アカウントを削除しますか？", account_delete_note: "クラウド上の記録データも削除され、元に戻せません。",
@@ -1580,6 +1602,7 @@ const TRANSLATIONS = {
     show_dining_toggle: "Show eating-out count (reflected both in the report display and the eating-out/home-cooked choice on the Add tab)",
     show_bento_toggle: "Add a \"Bento\" option (selectable alongside eating out / home-cooked)",
     calendar_as_button_toggle: "Swap Calendar and Budget positions (Calendar becomes a button, Budget stays always shown)",
+    dark_mode_toggle: "Dark mode",
     account_no_login_note: "You're currently signed out, and data is saved only on this device. Sign in to save your records to the cloud and sync across devices.",
     google_signin: "Sign in with Google",
     account_delete_confirm: "Delete your account?", account_delete_note: "Your cloud-saved records will also be deleted and cannot be recovered.",
@@ -1804,6 +1827,32 @@ function renderDayLogSheet(){
     sheet.innerHTML = "";
   }
 }
+function pickPhoto(onPicked){
+  const isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+  const CameraPlugin = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Camera;
+  if(isNative && CameraPlugin){
+    CameraPlugin.getPhoto({
+      resultType: "dataUrl",
+      source: "PROMPT",
+      quality: 70,
+      allowEditing: false
+    }).then(photo=>{
+      if(photo && photo.dataUrl) onPicked(photo.dataUrl);
+    }).catch(()=>{ /* ユーザーがキャンセルした場合は何もしない */ });
+    return;
+  }
+  const fallbackInput = document.createElement("input");
+  fallbackInput.type = "file";
+  fallbackInput.accept = "image/*";
+  fallbackInput.onchange = (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{ onPicked(ev.target.result); };
+    reader.readAsDataURL(file);
+  };
+  fallbackInput.click();
+}
 function stampDisplayName(stamp){
   if(!stamp) return "";
   if(stamp.id === "not_needed" || stamp.name === "要らなかったもの") return tr("stamp_not_needed");
@@ -1877,7 +1926,8 @@ let state = {
   reportCatOpen: false,
   calendarOpen: false,
   reportBudgetOpen: false,
-  calendarAsButton: false,
+  calendarAsButton: true,
+  darkMode: false,
   calendarSelectedDate: null,
   dayLogOpen: false,
   dayLogDate: null,
@@ -2105,6 +2155,7 @@ function getPersistData(){
     language: state.language,
     currency: state.currency,
     calendarAsButton: state.calendarAsButton,
+    darkMode: state.darkMode,
   };
 }
 
@@ -2222,6 +2273,7 @@ function applySelectedFont(){
 
 function render(){
   applySelectedFont();
+  document.documentElement.classList.toggle("dark-mode", !!state.darkMode);
   const c = document.getElementById("content");
   const navEl = document.getElementById("nav");
 
@@ -2355,7 +2407,7 @@ function renderCalcSheet(){
     backdrop.classList.add("open");
     sheet.innerHTML = `
       <div class="calc-sheet-handle"></div>
-      <div class="calc-amount-preview">${isCurrencyPrefix() ? `<span style="font-size:14px; color:var(--ink60); margin-right:4px;">${currencySymbol()}</span>` : ''}${state.inputAmount ? Number(state.inputAmount).toLocaleString('ja-JP') : '0'}${!isCurrencyPrefix() ? `<span style="font-size:14px; color:var(--ink60); margin-left:4px;">${currencySymbol()}</span>` : ''}</div>
+      <div class="calc-amount-preview">${isCurrencyPrefix() ? `<span style="font-size:20px; color:var(--ink); margin-right:4px;">${currencySymbol()}</span>` : ''}${state.inputAmount ? Number(state.inputAmount).toLocaleString('ja-JP') : '0'}${!isCurrencyPrefix() ? `<span style="font-size:14px; color:var(--ink60); margin-left:4px;">${currencySymbol()}</span>` : ''}</div>
       <div class="calc-grid">
         <button class="calc-key" style="grid-area:n7" data-key="7">7</button>
         <button class="calc-key" style="grid-area:n8" data-key="8">8</button>
@@ -2390,7 +2442,7 @@ function renderNav(){
   const nav = document.getElementById("nav");
   nav.innerHTML = tabs.map(tabItem=>`
     <button data-tab="${tabItem.k}" class="${state.tab===tabItem.k?'active':''}">
-      <svg viewBox="0 0 24 24" fill="none" stroke="${state.tab===tabItem.k?TOKENS.gold:'rgba(27,42,56,0.4)'}" stroke-width="${state.tab===tabItem.k?2.4:1.8}" stroke-linecap="round" stroke-linejoin="round">${tabItem.svg}</svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="${state.tab===tabItem.k?TOKENS.gold:'currentColor'}" stroke-width="${state.tab===tabItem.k?2.4:1.8}" stroke-linecap="round" stroke-linejoin="round">${tabItem.svg}</svg>
       <span class="label">${tabItem.label}</span>
     </button>
   `).join("");
@@ -3508,6 +3560,10 @@ function renderSettings(){
         <input type="checkbox" id="calendarAsButtonToggle" ${state.calendarAsButton ? 'checked' : ''} />
         <span>${tr("calendar_as_button_toggle")}</span>
       </label>
+      <label class="exclude-toggle">
+        <input type="checkbox" id="darkModeToggle" ${state.darkMode ? 'checked' : ''} />
+        <span>${tr("dark_mode_toggle")}</span>
+      </label>
 
       <div class="report-title" style="margin-top:6px;">${tr("font_title")}</div>
       <div class="font-option-list">
@@ -3804,18 +3860,8 @@ function attachHandlers(){
     }
 
     const photoSlot = document.getElementById("photoSlot");
-    const photoInput = document.getElementById("photoInput");
     if(photoSlot && !state.inputPhoto){
-      photoSlot.onclick = ()=> photoInput.click();
-    }
-    if(photoInput){
-      photoInput.onchange = (e)=>{
-        const file = e.target.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev)=>{ state.inputPhoto = ev.target.result; render(); };
-        reader.readAsDataURL(file);
-      };
+      photoSlot.onclick = ()=> pickPhoto((dataUrl)=>{ state.inputPhoto = dataUrl; render(); });
     }
     const removePhoto = document.getElementById("removePhoto");
     if(removePhoto){
@@ -4100,19 +4146,9 @@ function attachHandlers(){
     const editComment = document.querySelector("[data-edit-comment]");
     if(editComment) editComment.oninput = (e)=>{ state.editingDraft.comment = e.target.value; };
 
-    const editPhotoInput = document.getElementById("editPhotoInput");
     const editPhotoAdd = document.querySelector("[data-edit-photo-add]");
     const editPhotoRemove = document.querySelector("[data-edit-photo-remove]");
-    if(editPhotoAdd && editPhotoInput) editPhotoAdd.onclick = ()=> editPhotoInput.click();
-    if(editPhotoInput){
-      editPhotoInput.onchange = (e)=>{
-        const file = e.target.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev)=>{ state.editingDraft.photo = ev.target.result; render(); };
-        reader.readAsDataURL(file);
-      };
-    }
+    if(editPhotoAdd) editPhotoAdd.onclick = ()=> pickPhoto((dataUrl)=>{ state.editingDraft.photo = dataUrl; render(); });
     if(editPhotoRemove) editPhotoRemove.onclick = ()=>{ state.editingDraft.photo = null; render(); };
 
     const saveMemoryBtn = document.querySelector("[data-save-memory]");
@@ -4290,6 +4326,10 @@ function attachHandlers(){
           state.reportBudgetOpen = false;
           render();
         };
+      }
+      const darkModeToggle = document.getElementById("darkModeToggle");
+      if(darkModeToggle){
+        darkModeToggle.onchange = (e)=>{ state.darkMode = e.target.checked; render(); };
       }
       document.querySelectorAll("[data-font]").forEach(b=>{
         b.onclick = ()=>{ state.selectedFont = b.dataset.font; render(); };
