@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <title>思い出家計簿</title>
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -16,6 +16,11 @@
   @font-face{
     font-family:'kurobara-cinderella';
     src:url('fonts/kurobara-cinderella.woff2') format('woff2');
+    font-display:swap;
+  }
+  @font-face{
+    font-family:'tamanegi-kaisho';
+    src:url('fonts/tamanegi_kaisho.woff2') format('woff2');
     font-display:swap;
   }
   :root{
@@ -52,10 +57,19 @@
     background:linear-gradient(180deg,#0E161D 0%, #060A0E 100%);
   }
   *{box-sizing:border-box;}
+  html{
+    touch-action:manipulation;
+    -webkit-text-size-adjust:100%;
+    height:100%;
+    overflow:hidden;
+  }
   button, input, textarea, select{ font-family:inherit; }
   body{
     margin:0;
-    min-height:100vh;
+    height:100%;
+    overflow:hidden;
+    overscroll-behavior:none;
+    -webkit-overflow-scrolling:touch;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -117,12 +131,14 @@
     flex:1;
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
   }
   .nav{
     display:flex;
     border-top:1px solid var(--line);
     background:var(--cream);
     flex:0 0 auto;
+    padding-bottom:env(safe-area-inset-bottom);
   }
   .nav button{
     flex:1;
@@ -1360,6 +1376,16 @@
   .font-boost .font-option-sample{ font-size:22px; }
   .font-boost .save-btn, .font-boost .add-btn{ font-size:15.5px; }
   .font-boost .yakiin-stamp{ font-size:12.5px; }
+  .font-boost-emberly .cmt{ font-size:18px; line-height:1.9; }
+  .font-boost-emberly .badge{ font-size:14px; }
+  .font-boost-emberly .amt{ font-size:17px; }
+  .font-boost-emberly .date{ font-size:13px; }
+  .font-boost-emberly .headline, .font-boost-emberly .ym{ font-size:21px; }
+  .font-boost-emberly .report-title{ font-size:19px; }
+  .font-boost-emberly .cat-btn .name{ font-size:14px; }
+  .font-boost-emberly .font-option-sample{ font-size:26px; }
+  .font-boost-emberly .save-btn, .font-boost-emberly .add-btn{ font-size:17px; }
+  .font-boost-emberly .num{ font-size:38px; }
   /* ==================== 思い出カード：フレームデザイン ==================== */
   .frame-vine{ position:relative; padding:20px; }
   .vine-border-layer{
@@ -1468,6 +1494,15 @@
       document.documentElement.classList.add('native-app');
     }
   })();
+  (function(){
+    document.addEventListener('gesturestart', function(e){ e.preventDefault(); });
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e){
+      const now = Date.now();
+      if(now - lastTouchEnd <= 350){ e.preventDefault(); }
+      lastTouchEnd = now;
+    }, { passive:false });
+  })();
 </script>
 <body>
 
@@ -1562,6 +1597,9 @@ const TRANSLATIONS = {
     show_bento_toggle: "「弁当」の選択肢を追加する（外食／自炊に加えて選べるようになります）",
     calendar_as_button_toggle: "カレンダーと予算の位置を入れ替える（予算をボタン、カレンダーを常時表示にします）",
     dark_mode_toggle: "ダークモード",
+    example_t1: "江ノ島シーキャンドル（展望灯台）の入場料。頂上からの景色に感動した。",
+    example_t5: "ちなみに、ここに出ている例の買い物はレポート欄の会計には入らないようになっています。",
+    example_t6: "同僚とランチ。",
     account_no_login_note: "現在はログインなしで、この端末だけにデータを保存しています。ログインすると、記録をクラウドに保存し、他の端末とも同期できるようになります。",
     google_signin: "Googleでログイン",
     account_delete_confirm: "アカウントを削除しますか？", account_delete_note: "クラウド上の記録データも削除され、元に戻せません。",
@@ -1629,6 +1667,9 @@ const TRANSLATIONS = {
     show_bento_toggle: "Add a \"Bento\" option (selectable alongside eating out / home-cooked)",
     calendar_as_button_toggle: "Swap Calendar and Budget positions (Budget becomes a button, Calendar stays always shown)",
     dark_mode_toggle: "Dark mode",
+    example_t1: "Admission to the Enoshima Sea Candle (observation tower). The view from the top was amazing.",
+    example_t5: "The sample purchases listed here are not included in the total for the \"Reports\" section.",
+    example_t6: "Lunch with a coworker.",
     account_no_login_note: "You're currently signed out, and data is saved only on this device. Sign in to save your records to the cloud and sync across devices.",
     google_signin: "Sign in with Google",
     account_delete_confirm: "Delete your account?", account_delete_note: "Your cloud-saved records will also be deleted and cannot be recovered.",
@@ -1929,6 +1970,12 @@ const DEFAULT_CAT_NAME_BY_JA = {
   "日用品":"cat_daily", "カフェ":"cat_cafe", "住居":"cat_housing", "その他":"cat_other",
   "給与":"cat_salary", "バイト代":"cat_parttime", "お小遣い":"cat_allowance",
 };
+const EXAMPLE_COMMENT_KEYS = { t1:"example_t1", t5:"example_t5", t6:"example_t6" };
+function transactionCommentDisplay(t){
+  if(!t) return "";
+  const key = t.isExample && EXAMPLE_COMMENT_KEYS[t.id];
+  return key ? tr(key) : t.comment;
+}
 function categoryDisplayName(cat){
   if(!cat) return "";
   const key = DEFAULT_CAT_NAME_KEYS[cat.id] || DEFAULT_CAT_NAME_BY_JA[cat.name];
@@ -2264,17 +2311,34 @@ function renderAuthLoading(){
 function introBodyHtml(){
   if(state.language === "en"){
     return `
-      <div class="intro-section-title">A note from the developer</div>
+      <div class="intro-section-title">Thank you for downloading.</div>
       <p class="intro-text">
-        Since your payments are saved as a timeline of memories, adding descriptions of photos and purchases will make looking back on them even more fun later.
+        Most budget apps make it hard to stay motivated, and you rarely get a chance to look back on what you spent. In this app, your purchases stay on a timeline, so it's fun and easy to keep going!
       </p>
-      <p class="intro-text">
-        Try applying a label—such as "waste of money"—as you scroll through your history.
+      <p class="intro-text" style="margin-bottom:16px;">
+        Here's how it works.
       </p>
-      <p class="intro-text">
-        You can check the number of transactions and the total amount for each label at any time in the Reports tab, making it easy to review how you spend your money.<br>
-        (Of course, depending on the labels you choose, you can look back not only on things you regret but also on fun memories.)
-      </p>
+      <div class="intro-step">
+        <span class="num">1</span>
+        <div class="body">
+          <div class="step-title">Record it</div>
+          <div class="step-desc">Just pick an amount and a category. You can add a photo or a short note too.</div>
+        </div>
+      </div>
+      <div class="intro-step">
+        <span class="num">2</span>
+        <div class="body">
+          <div class="step-title">Look back on your timeline</div>
+          <div class="step-desc">Your records line up as "memories" you can revisit anytime.</div>
+        </div>
+      </div>
+      <div class="intro-step">
+        <span class="num">3</span>
+        <div class="body">
+          <div class="step-title">Sort with stamps</div>
+          <div class="step-desc">Tag purchases with your own labels—like "waste of money"—and review them together in the Reports tab.</div>
+        </div>
+      </div>
       <div class="intro-section-title">Tips</div>
       <ul class="intro-tips">
         <li>You can also tap the "0" amount to open the calculator.</li>
@@ -2335,6 +2399,7 @@ const FONT_OPTIONS = {
   default: { label: "標準（Noto Sans JP）", labelEn: "Default (Noto Sans JP)", serif:"'Noto Sans JP', sans-serif", sans:"'Noto Sans JP', sans-serif", langs:["ja","en"] },
   zenmaru: { label: "Zen丸ゴシック", labelEn: "Zen Maru Gothic", serif:"'Zen Maru Gothic', sans-serif", sans:"'Zen Maru Gothic', sans-serif", langs:["ja","en"] },
   kurobara: { label: "kurobara-cinderella", labelEn: "kurobara-cinderella", serif:"'kurobara-cinderella', serif", sans:"'kurobara-cinderella', sans-serif", langs:["ja"] },
+  tamanegi: { label: "玉ねぎ楷書", labelEn: "玉ねぎ楷書", serif:"'tamanegi-kaisho', serif", sans:"'tamanegi-kaisho', sans-serif", langs:["ja"] },
   spacemono: { label: "Space Mono", labelEn: "Space Mono", serif:"'SpaceMono', monospace", sans:"'SpaceMono', monospace", langs:["en"] },
   emberly: { label: "Emberly", labelEn: "Emberly", serif:"'Emberly', serif", sans:"'Emberly', serif", langs:["en"] },
 };
@@ -2355,7 +2420,8 @@ function applySelectedFont(){
   const opt = FONT_OPTIONS[effectiveFont] || FONT_OPTIONS.default;
   document.documentElement.style.setProperty("--font-serif", opt.serif);
   document.documentElement.style.setProperty("--font-sans", opt.sans);
-  document.documentElement.classList.toggle("font-boost", effectiveFont === "kurobara" || effectiveFont === "emberly");
+  document.documentElement.classList.toggle("font-boost", effectiveFont === "kurobara" || effectiveFont === "emberly" || effectiveFont === "tamanegi");
+  document.documentElement.classList.toggle("font-boost-emberly", effectiveFont === "emberly");
 }
 
 function render(){
@@ -3075,7 +3141,7 @@ function buildSimpleMemoryCards(txList){
             <span class="amt" style="color:${t.type==='income'?TOKENS.moss:TOKENS.bengara}">${t.type==='income'?'+':'-'}${yen(t.amount)}</span>
           </div>
           ${t.photo ? `<img src="${t.photo}" />` : ''}
-          <div class="cmt ${t.comment?'':'cmt-empty'}">${t.comment || tr("memo_placeholder")}</div>
+          <div class="cmt ${t.comment?'':'cmt-empty'}">${transactionCommentDisplay(t) || tr("memo_placeholder")}</div>
         </div>
     `;
     return wrapCardFrame(innerHtml, c.color, rotate);
@@ -3227,7 +3293,7 @@ function renderMemory(){
                 <span class="amt" style="color:${t.type==='income'?TOKENS.moss:TOKENS.bengara}">${t.type==='income'?'+':'-'}${yen(t.amount)}</span>
               </div>
               ${t.photo ? `<img src="${t.photo}" />` : ''}
-              <div class="cmt ${t.comment?'':'cmt-empty'}">${t.comment || tr("memo_placeholder")}</div>
+              <div class="cmt ${t.comment?'':'cmt-empty'}">${transactionCommentDisplay(t) || tr("memo_placeholder")}</div>
             </div>
         `;
         return wrapCardFrame(innerHtml, c.color, rotate);
