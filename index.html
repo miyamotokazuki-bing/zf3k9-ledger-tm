@@ -1600,6 +1600,25 @@ const TRANSLATIONS = {
     example_t1: "江ノ島シーキャンドル（展望灯台）の入場料。頂上からの景色に感動した。",
     example_t5: "ちなみに、ここに出ている例の買い物はレポート欄の会計には入らないようになっています。",
     example_t6: "同僚とランチ。",
+    delete_all_data_title: "全収支データを削除",
+    delete_all_data_desc: "記録した支出・収入データをすべて削除します。カテゴリ・予算・固定費・烙印の設定は残ります。",
+    delete_all_data_btn: "全収支データを削除する",
+    delete_all_data_confirm: "本当に削除しますか？この操作は元に戻せません。",
+    delete_all_data_done: "全収支データを削除しました。",
+    settings_notifications: "通知",
+    notifications_off_toggle: "通知をオフにする",
+    review_notify_title: "振り返り通知",
+    review_notify_day_label: "曜日",
+    review_notify_time_label: "時刻",
+    reminder_notify_title: "記録リマインド通知",
+    reminder_freq_label: "頻度",
+    reminder_freq_1: "毎日", reminder_freq_2: "2日に1回", reminder_freq_3: "3日に1回",
+    reminder_notify_time_label: "時刻",
+    notify_app_title: "思い出家計簿",
+    review_notify_body: "そろそろ買い物タイムラインを確認しますか？",
+    reminder_notify_body: "家計簿のリマインド通知です。|ω・)",
+    weekday_sun: "日", weekday_mon: "月", weekday_tue: "火", weekday_wed: "水",
+    weekday_thu: "木", weekday_fri: "金", weekday_sat: "土",
     account_no_login_note: "現在はログインなしで、この端末だけにデータを保存しています。ログインすると、記録をクラウドに保存し、他の端末とも同期できるようになります。",
     google_signin: "Googleでログイン",
     account_delete_confirm: "アカウントを削除しますか？", account_delete_note: "クラウド上の記録データも削除され、元に戻せません。",
@@ -1670,6 +1689,25 @@ const TRANSLATIONS = {
     example_t1: "Admission to the Enoshima Sea Candle (observation tower). The view from the top was amazing.",
     example_t5: "The sample purchases listed here are not included in the total for the \"Reports\" section.",
     example_t6: "Lunch with a coworker.",
+    delete_all_data_title: "Delete All Records",
+    delete_all_data_desc: "Deletes all of your recorded income and expenses. Your categories, budgets, fixed costs, and stamps will stay.",
+    delete_all_data_btn: "Delete all records",
+    delete_all_data_confirm: "Are you sure you want to delete everything? This cannot be undone.",
+    delete_all_data_done: "All records have been deleted.",
+    settings_notifications: "Notifications",
+    notifications_off_toggle: "Turn off notifications",
+    review_notify_title: "Weekly Review",
+    review_notify_day_label: "Day",
+    review_notify_time_label: "Time",
+    reminder_notify_title: "Recording Reminder",
+    reminder_freq_label: "Frequency",
+    reminder_freq_1: "Every day", reminder_freq_2: "Every 2 days", reminder_freq_3: "Every 3 days",
+    reminder_notify_time_label: "Time",
+    notify_app_title: "Omoide Kakeibo",
+    review_notify_body: "Ready to check your purchase timeline?",
+    reminder_notify_body: "Here comes your budget app(๑╹ω╹๑ )",
+    weekday_sun: "Sun", weekday_mon: "Mon", weekday_tue: "Tue", weekday_wed: "Wed",
+    weekday_thu: "Thu", weekday_fri: "Fri", weekday_sat: "Sat",
     account_no_login_note: "You're currently signed out, and data is saved only on this device. Sign in to save your records to the cloud and sync across devices.",
     google_signin: "Sign in with Google",
     account_delete_confirm: "Delete your account?", account_delete_note: "Your cloud-saved records will also be deleted and cannot be recovered.",
@@ -1989,6 +2027,14 @@ let state = {
   guestMode: false,
   introSeen: false,
   accountDeleteConfirm: false,
+  deleteAllConfirm: false,
+  notificationsOff: false,
+  reviewNotifyDay: 1,
+  reviewNotifyHour: 21,
+  reviewNotifyMinute: 0,
+  reminderFreqDays: 1,
+  reminderNotifyHour: 20,
+  reminderNotifyMinute: 0,
   csvIncludeDining: true,
   csvIncludeComment: true,
   csvIncludeStamps: true,
@@ -2264,6 +2310,13 @@ function getPersistData(){
     currency: state.currency,
     calendarAsButton: state.calendarAsButton,
     darkMode: state.darkMode,
+    notificationsOff: state.notificationsOff,
+    reviewNotifyDay: state.reviewNotifyDay,
+    reviewNotifyHour: state.reviewNotifyHour,
+    reviewNotifyMinute: state.reviewNotifyMinute,
+    reminderFreqDays: state.reminderFreqDays,
+    reminderNotifyHour: state.reminderNotifyHour,
+    reminderNotifyMinute: state.reminderNotifyMinute,
   };
 }
 
@@ -2404,6 +2457,70 @@ const FONT_OPTIONS = {
   emberly: { label: "Emberly", labelEn: "Emberly", serif:"'Emberly', serif", sans:"'Emberly', serif", langs:["en"] },
 };
 
+function getNotificationsPlugin(){
+  const isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+  if(!isNative) return null;
+  return (window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) || null;
+}
+async function rescheduleNotifications(){
+  const LN = getNotificationsPlugin();
+  if(!LN) return;
+  try{
+    const pending = await LN.getPending();
+    if(pending && pending.notifications && pending.notifications.length){
+      await LN.cancel({ notifications: pending.notifications.map(n=>({ id:n.id })) });
+    }
+  }catch(e){ console.warn("通知のキャンセルに失敗", e); }
+
+  if(state.notificationsOff) return;
+
+  try{
+    const perm = await LN.checkPermissions();
+    if(perm.display !== "granted"){
+      const req = await LN.requestPermissions();
+      if(req.display !== "granted") return;
+    }
+  }catch(e){ console.warn("通知権限の確認に失敗", e); return; }
+
+  const notifications = [];
+
+  // 振り返り通知（毎週、指定曜日・時刻に繰り返し）
+  notifications.push({
+    id: 1,
+    title: tr("notify_app_title"),
+    body: tr("review_notify_body"),
+    schedule: { on: { weekday: state.reviewNotifyDay + 1, hour: state.reviewNotifyHour, minute: state.reviewNotifyMinute } }
+  });
+
+  // 記録リマインド通知
+  if(state.reminderFreqDays <= 1){
+    notifications.push({
+      id: 2,
+      title: tr("notify_app_title"),
+      body: tr("reminder_notify_body"),
+      schedule: { on: { hour: state.reminderNotifyHour, minute: state.reminderNotifyMinute } }
+    });
+  } else {
+    // 2〜3日に1回はネイティブの繰り返し指定がないため、直近60日分を個別にスケジュール
+    const now = new Date();
+    let next = new Date(now.getFullYear(), now.getMonth(), now.getDate(), state.reminderNotifyHour, state.reminderNotifyMinute, 0);
+    if(next <= now) next.setDate(next.getDate() + state.reminderFreqDays);
+    const count = Math.ceil(60 / state.reminderFreqDays);
+    for(let i=0; i<count; i++){
+      notifications.push({
+        id: 100 + i,
+        title: tr("notify_app_title"),
+        body: tr("reminder_notify_body"),
+        schedule: { at: new Date(next) }
+      });
+      next = new Date(next.getTime() + state.reminderFreqDays * 24 * 60 * 60 * 1000);
+    }
+  }
+
+  try{
+    await LN.schedule({ notifications });
+  }catch(e){ console.warn("通知の設定に失敗しました", e); }
+}
 function applyStatusBarTheme(){
   const isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
   const StatusBarPlugin = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar;
@@ -3529,6 +3646,7 @@ function renderSettings(){
       <button data-sub="stamps" class="${state.settingsSubTab==='stamps'?'active':''}">${tr("settings_stamps")}</button>
       <button data-sub="account" class="${state.settingsSubTab==='account'?'active':''}">${tr("settings_account")}</button>
       <button data-sub="data" class="${state.settingsSubTab==='data'?'active':''}">${tr("settings_data")}</button>
+      <button data-sub="notifications" class="${state.settingsSubTab==='notifications'?'active':''}">${tr("settings_notifications")}</button>
       <button id="settingsTipsBtn">${tr("settings_tips")}</button>
       <button id="languageToggleBtn">🌐 ${state.language === "ja" ? "Language" : "言語"}</button>
     </div>
@@ -3579,6 +3697,80 @@ function renderSettings(){
           <span>${tr("csv_fixed")}</span>
         </label>
         <button class="add-btn" id="exportCsvBtn">${tr("csv_download_btn")}</button>
+
+        <div class="report-title" style="padding:0; margin:28px 0 8px;">${tr("delete_all_data_title")}</div>
+        <p style="font-size:12px; color:var(--ink60); line-height:1.7; margin:0 0 14px;">
+          ${tr("delete_all_data_desc")}
+        </p>
+        ${state.deleteAllConfirm ? `
+          <div class="cat-delete-confirm" style="margin:0;">
+            <p>${tr("delete_all_data_confirm")}</p>
+            <div class="row">
+              <button class="btn-confirm" id="deleteAllConfirmBtn">${tr("delete_btn")}</button>
+              <button class="btn-cancel" id="deleteAllCancelBtn">${tr("cancel")}</button>
+            </div>
+          </div>
+        ` : `
+          <button class="account-btn delete" id="deleteAllDataBtn">${tr("delete_all_data_btn")}</button>
+        `}
+      </div>
+    `;
+  }
+
+  if(state.settingsSubTab === "notifications"){
+    const weekdayOpts = [
+      ["0",tr("weekday_sun")],["1",tr("weekday_mon")],["2",tr("weekday_tue")],["3",tr("weekday_wed")],
+      ["4",tr("weekday_thu")],["5",tr("weekday_fri")],["6",tr("weekday_sat")],
+    ];
+    const hourOpts = Array.from({length:24},(_,i)=>i);
+    const minuteOpts = [0,15,30,45];
+    return `
+      ${sub}
+      <div style="padding:0 16px 16px;">
+        <label class="exclude-toggle" style="padding:8px 0 16px;">
+          <input type="checkbox" id="notificationsOffToggle" ${state.notificationsOff?'checked':''} />
+          <span>${tr("notifications_off_toggle")}</span>
+        </label>
+
+        <div style="opacity:${state.notificationsOff?'0.4':'1'}; pointer-events:${state.notificationsOff?'none':'auto'};">
+          <div class="report-title" style="padding:0; margin-bottom:10px;">${tr("review_notify_title")}</div>
+          <div class="row" style="display:flex; gap:8px; margin-bottom:20px;">
+            <div class="field" style="flex:1;">
+              <label style="font-size:11.5px; color:var(--ink60);">${tr("review_notify_day_label")}</label>
+              <select id="reviewNotifyDay">
+                ${weekdayOpts.map(([v,label])=>`<option value="${v}" ${String(state.reviewNotifyDay)===v?'selected':''}>${label}</option>`).join("")}
+              </select>
+            </div>
+            <div class="field" style="flex:1;">
+              <label style="font-size:11.5px; color:var(--ink60);">${tr("review_notify_time_label")}</label>
+              <div style="display:flex; gap:4px;">
+                <select id="reviewNotifyHour">
+                  ${hourOpts.map(h=>`<option value="${h}" ${state.reviewNotifyHour===h?'selected':''}>${String(h).padStart(2,'0')}</option>`).join("")}
+                </select>
+                <select id="reviewNotifyMinute">
+                  ${minuteOpts.map(m=>`<option value="${m}" ${state.reviewNotifyMinute===m?'selected':''}>${String(m).padStart(2,'0')}</option>`).join("")}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="report-title" style="padding:0; margin-bottom:10px;">${tr("reminder_notify_title")}</div>
+          <label style="font-size:11.5px; color:var(--ink60);">${tr("reminder_freq_label")}</label>
+          <div class="switch" style="margin:6px 0 14px;">
+            <button data-reminder-freq="1" class="${state.reminderFreqDays===1?'active':''}">${tr("reminder_freq_1")}</button>
+            <button data-reminder-freq="2" class="${state.reminderFreqDays===2?'active':''}">${tr("reminder_freq_2")}</button>
+            <button data-reminder-freq="3" class="${state.reminderFreqDays===3?'active':''}">${tr("reminder_freq_3")}</button>
+          </div>
+          <label style="font-size:11.5px; color:var(--ink60);">${tr("reminder_notify_time_label")}</label>
+          <div style="display:flex; gap:4px; margin-top:6px;">
+            <select id="reminderNotifyHour">
+              ${hourOpts.map(h=>`<option value="${h}" ${state.reminderNotifyHour===h?'selected':''}>${String(h).padStart(2,'0')}</option>`).join("")}
+            </select>
+            <select id="reminderNotifyMinute">
+              ${minuteOpts.map(m=>`<option value="${m}" ${state.reminderNotifyMinute===m?'selected':''}>${String(m).padStart(2,'0')}</option>`).join("")}
+            </select>
+          </div>
+        </div>
       </div>
     `;
   }
@@ -4445,6 +4637,62 @@ function attachHandlers(){
           }
         };
       }
+      const deleteAllDataBtn = document.getElementById("deleteAllDataBtn");
+      if(deleteAllDataBtn){
+        deleteAllDataBtn.onclick = ()=>{ state.deleteAllConfirm = true; render(); };
+      }
+      const deleteAllConfirmBtn = document.getElementById("deleteAllConfirmBtn");
+      if(deleteAllConfirmBtn){
+        deleteAllConfirmBtn.onclick = ()=>{
+          state.transactions = [];
+          state.deleteAllConfirm = false;
+          saveState();
+          render();
+          alert(tr("delete_all_data_done"));
+        };
+      }
+      const deleteAllCancelBtn = document.getElementById("deleteAllCancelBtn");
+      if(deleteAllCancelBtn){
+        deleteAllCancelBtn.onclick = ()=>{ state.deleteAllConfirm = false; render(); };
+      }
+    }
+
+    if(state.settingsSubTab === "notifications"){
+      const notificationsOffToggle = document.getElementById("notificationsOffToggle");
+      if(notificationsOffToggle){
+        notificationsOffToggle.onchange = (e)=>{
+          state.notificationsOff = e.target.checked;
+          rescheduleNotifications();
+          render();
+        };
+      }
+      const reviewNotifyDay = document.getElementById("reviewNotifyDay");
+      if(reviewNotifyDay){
+        reviewNotifyDay.onchange = (e)=>{ state.reviewNotifyDay = Number(e.target.value); rescheduleNotifications(); };
+      }
+      const reviewNotifyHour = document.getElementById("reviewNotifyHour");
+      if(reviewNotifyHour){
+        reviewNotifyHour.onchange = (e)=>{ state.reviewNotifyHour = Number(e.target.value); rescheduleNotifications(); };
+      }
+      const reviewNotifyMinute = document.getElementById("reviewNotifyMinute");
+      if(reviewNotifyMinute){
+        reviewNotifyMinute.onchange = (e)=>{ state.reviewNotifyMinute = Number(e.target.value); rescheduleNotifications(); };
+      }
+      document.querySelectorAll("[data-reminder-freq]").forEach(b=>{
+        b.onclick = ()=>{
+          state.reminderFreqDays = Number(b.dataset.reminderFreq);
+          rescheduleNotifications();
+          render();
+        };
+      });
+      const reminderNotifyHour = document.getElementById("reminderNotifyHour");
+      if(reminderNotifyHour){
+        reminderNotifyHour.onchange = (e)=>{ state.reminderNotifyHour = Number(e.target.value); rescheduleNotifications(); };
+      }
+      const reminderNotifyMinute = document.getElementById("reminderNotifyMinute");
+      if(reminderNotifyMinute){
+        reminderNotifyMinute.onchange = (e)=>{ state.reminderNotifyMinute = Number(e.target.value); rescheduleNotifications(); };
+      }
     }
 
     if(state.settingsSubTab === "budget"){
@@ -5209,6 +5457,7 @@ loadState();
 state.guestMode = loadGuestMode();
 if(state.guestMode){ state.authReady = true; }
 render();
+rescheduleNotifications();
 
 // ホーム画面アイコンなどから開き直した際、バックグラウンド復帰で
 // 以前のタブのまま表示されることがあるため、毎回ホーム画面（入力タブ）から始まるようにする
