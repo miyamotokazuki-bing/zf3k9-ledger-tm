@@ -90,12 +90,15 @@
     box-shadow:0 20px 50px rgba(0,0,0,0.35);
     position:relative;
   }
+  html.native-app{ height:100%; }
   html.native-app body{
-    padding:0; background:var(--paper); align-items:stretch; justify-content:stretch;
+    padding:0; margin:0; background:var(--paper); align-items:stretch; justify-content:stretch;
+    position:fixed; inset:0; height:auto; min-height:0;
   }
   html.native-app .phone{
-    width:100%; max-width:100%; height:100%; height:100dvh;
+    width:100%; max-width:100%; height:100%;
     border:none; border-radius:0; box-shadow:none;
+    position:absolute; inset:0;
   }
   .header{
     background:var(--ink);
@@ -1612,7 +1615,7 @@ const TRANSLATIONS = {
     review_notify_time_label: "時刻",
     reminder_notify_title: "記録リマインド通知",
     reminder_freq_label: "頻度",
-    reminder_freq_1: "毎日", reminder_freq_2: "2日に1回", reminder_freq_3: "3日に1回",
+    reminder_freq_0: "オフ", reminder_freq_1: "毎日", reminder_freq_2: "2日に1回", reminder_freq_3: "3日に1回",
     reminder_notify_time_label: "時刻",
     notify_app_title: "思い出家計簿",
     review_notify_body: "そろそろ買い物タイムラインを確認しますか？",
@@ -1701,7 +1704,7 @@ const TRANSLATIONS = {
     review_notify_time_label: "Time",
     reminder_notify_title: "Recording Reminder",
     reminder_freq_label: "Frequency",
-    reminder_freq_1: "Every day", reminder_freq_2: "Every 2 days", reminder_freq_3: "Every 3 days",
+    reminder_freq_0: "Off", reminder_freq_1: "Every day", reminder_freq_2: "Every 2 days", reminder_freq_3: "Every 3 days",
     reminder_notify_time_label: "Time",
     notify_app_title: "Omoide Kakeibo",
     review_notify_body: "Ready to check your purchase timeline?",
@@ -2492,15 +2495,15 @@ async function rescheduleNotifications(){
     schedule: { on: { weekday: state.reviewNotifyDay + 1, hour: state.reviewNotifyHour, minute: state.reviewNotifyMinute } }
   });
 
-  // 記録リマインド通知
-  if(state.reminderFreqDays <= 1){
+  // 記録リマインド通知（0回＝オフの場合はスキップ）
+  if(state.reminderFreqDays === 1){
     notifications.push({
       id: 2,
       title: tr("notify_app_title"),
       body: tr("reminder_notify_body"),
       schedule: { on: { hour: state.reminderNotifyHour, minute: state.reminderNotifyMinute } }
     });
-  } else {
+  } else if(state.reminderFreqDays > 1){
     // 2〜3日に1回はネイティブの繰り返し指定がないため、直近60日分を個別にスケジュール
     const now = new Date();
     let next = new Date(now.getFullYear(), now.getMonth(), now.getDate(), state.reminderNotifyHour, state.reminderNotifyMinute, 0);
@@ -3757,6 +3760,7 @@ function renderSettings(){
           <div class="report-title" style="padding:0; margin-bottom:10px;">${tr("reminder_notify_title")}</div>
           <label style="font-size:11.5px; color:var(--ink60);">${tr("reminder_freq_label")}</label>
           <div class="switch" style="margin:6px 0 14px;">
+            <button data-reminder-freq="0" class="${state.reminderFreqDays===0?'active':''}">${tr("reminder_freq_0")}</button>
             <button data-reminder-freq="1" class="${state.reminderFreqDays===1?'active':''}">${tr("reminder_freq_1")}</button>
             <button data-reminder-freq="2" class="${state.reminderFreqDays===2?'active':''}">${tr("reminder_freq_2")}</button>
             <button data-reminder-freq="3" class="${state.reminderFreqDays===3?'active':''}">${tr("reminder_freq_3")}</button>
