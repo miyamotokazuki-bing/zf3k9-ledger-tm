@@ -243,7 +243,7 @@
 
   .amount-box{
     flex:1;
-    text-align:right;
+    display:flex; align-items:center; justify-content:flex-end;
     padding:0 2px;
   }
   .amount-box .num{
@@ -253,6 +253,15 @@
     letter-spacing:.5px;
   }
   .amount-box .num.empty{ color:var(--ink40); }
+  .amount-box .num-input{
+    font-family:var(--font-serif);
+    font-size:34px;
+    color:var(--ink);
+    letter-spacing:.5px;
+    background:transparent; border:none; outline:none;
+    text-align:right; flex:1; min-width:0; padding:0;
+  }
+  .amount-box .num-input::placeholder{ color:var(--ink40); }
   .amount-box .yen{ font-size:15px; color:var(--ink60); margin-left:4px; }
   .amount-box .yen-prefix{
     font-family:var(--font-serif); font-size:26px; color:var(--ink); font-weight:600;
@@ -2759,9 +2768,9 @@ function renderInput(){
     </div>
 
     <div class="amount-row">
-      <div class="amount-box" id="amountBoxTap" style="cursor:pointer;">
+      <div class="amount-box">
         ${isCurrencyPrefix() ? `<span class="yen yen-prefix">${currencySymbol()}</span>` : ''}
-        <span class="num ${state.inputAmount?'':'empty'}">${state.inputAmount ? Number(state.inputAmount).toLocaleString('ja-JP') : '0'}</span>
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="amountNativeInput" class="num-input" maxlength="9" placeholder="0" value="${state.inputAmount ? Number(state.inputAmount).toLocaleString('ja-JP') : ''}" />
         ${!isCurrencyPrefix() ? `<span class="yen">${currencySymbol()}</span>` : ''}
       </div>
     </div>
@@ -4135,11 +4144,18 @@ function attachHandlers(){
     });
     const calcToggleBtn = document.getElementById("calcToggleBtn");
     if(calcToggleBtn){
-      calcToggleBtn.onclick = ()=>{ state.calcOpen = true; state.datePickerOpen = false; render(); };
+      calcToggleBtn.onclick = ()=>{
+        const inp = document.getElementById("amountNativeInput");
+        if(inp) inp.focus();
+      };
     }
-    const amountBoxTap = document.getElementById("amountBoxTap");
-    if(amountBoxTap){
-      amountBoxTap.onclick = ()=>{ state.calcOpen = true; state.datePickerOpen = false; render(); };
+    const amountNativeInput = document.getElementById("amountNativeInput");
+    if(amountNativeInput){
+      amountNativeInput.oninput = (e)=>{
+        const digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 9);
+        state.inputAmount = digits === "" ? "" : String(Number(digits));
+        e.target.value = state.inputAmount ? Number(state.inputAmount).toLocaleString('ja-JP') : "";
+      };
     }
     document.querySelectorAll(".keypad button").forEach(b=>{
       b.onclick = ()=>{
@@ -5307,22 +5323,43 @@ function attachHandlers(){
   // 電卓ボトムシート（どのタブの上にも被さるため、他のタブブロックの外側で処理）
   const sheetEl = document.getElementById("calcSheet");
   if(sheetEl && state.calcOpen){
+    const updateCalcDisplay = ()=>{
+      // 電卓シート内の金額プレビューだけを軽量に更新（フルrender()を避ける）
+      const preview = sheetEl.querySelector(".calc-amount-preview");
+      if(preview){
+        const numText = state.inputAmount ? Number(state.inputAmount).toLocaleString('ja-JP') : '0';
+        if(isCurrencyPrefix()){
+          preview.innerHTML = `<span style="font-size:20px; color:var(--ink); margin-right:4px;">${currencySymbol()}</span>${numText}`;
+        } else {
+          preview.innerHTML = `${numText}<span style="font-size:14px; color:var(--ink60); margin-left:4px;">${currencySymbol()}</span>`;
+        }
+      }
+      // 入力タブの金額欄も、開いていれば同時に更新
+      const amountBox = document.getElementById("amountBoxTap");
+      if(amountBox){
+        const numEl = amountBox.querySelector(".num");
+        if(numEl){
+          numEl.textContent = state.inputAmount ? Number(state.inputAmount).toLocaleString('ja-JP') : '0';
+          numEl.classList.toggle("empty", !state.inputAmount);
+        }
+      }
+    };
     sheetEl.querySelectorAll(".calc-key").forEach(b=>{
       b.onclick = ()=>{
         const k = b.dataset.key;
         if(state.inputAmount.length < 9){
           state.inputAmount = state.inputAmount==="0" ? k : state.inputAmount + k;
         }
-        render();
+        updateCalcDisplay();
       };
     });
     const calcAcBtn = document.getElementById("calcAcBtn");
     if(calcAcBtn){
-      calcAcBtn.onclick = ()=>{ state.inputAmount = ""; render(); };
+      calcAcBtn.onclick = ()=>{ state.inputAmount = ""; updateCalcDisplay(); };
     }
     const calcDelBtn = document.getElementById("calcDelBtn");
     if(calcDelBtn){
-      calcDelBtn.onclick = ()=>{ state.inputAmount = state.inputAmount.slice(0,-1); render(); };
+      calcDelBtn.onclick = ()=>{ state.inputAmount = state.inputAmount.slice(0,-1); updateCalcDisplay(); };
     }
     const calcOkBtn = document.getElementById("calcOkBtn");
     if(calcOkBtn){
